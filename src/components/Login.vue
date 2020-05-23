@@ -3,7 +3,7 @@
     <el-dialog
       :title="loginFlag ? '登陆' : '注册'"
       width="26rem"
-      :visible.sync="loginVisiable"
+      :visible="loginVisiable"
       :modal-append-to-body="false"
       :close-on-click-modal="false"
       @close="close"

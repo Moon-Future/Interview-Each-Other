@@ -56,8 +56,6 @@ export default {
   },
   data() {
     return {
-      loginVisiable: false,
-      loginFlag: true,
       dropdownList: [
         {
           icon: 'icon-setting',
@@ -126,6 +124,9 @@ export default {
   height: 50px;
   line-height: 50px;
   padding: 0 10px;
+  width: 80%;
+  min-width: 600px;
+  user-select: none;
   .header-logo {
     cursor: pointer;
     font-family: rubik, arial;
