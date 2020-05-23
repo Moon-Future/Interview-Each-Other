@@ -21,7 +21,7 @@
                   v-model="form[field.prop]"
                   :placeholder="field.placeholder"
                 ></el-input>
-                <el-button type="primary">获取验证码</el-button>
+                <el-button type="success">获取验证码</el-button>
               </div>
             </template>
             <template v-else>
@@ -50,7 +50,7 @@
       </el-form>
       <el-button
         class="submit-btn"
-        type="primary"
+        type="success"
         :loading="submitting"
         @click.native="submit"
         >{{ loginFlag ? '登陆' : '注册' }}</el-button
@@ -273,12 +273,12 @@ export default {
 .form-message {
   padding: 15px 0;
   .span-link {
-    color: $color-blue;
+    color: $color-green;
     cursor: pointer;
   }
 }
 .has-account {
-  color: $color-blue;
+  color: $color-green;
   text-align: center;
   margin: 15px;
   span {

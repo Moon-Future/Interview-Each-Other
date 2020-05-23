@@ -1,3 +1,5 @@
+@import './scss/variable.scss';
+
 /**
  * Eric Meyer's Reset CSS v2.0 (http://meyerweb.com/eric/tools/css/reset/)
  * http://cssreset.com
@@ -31,6 +33,7 @@
  body {
   line-height: 1;
   overflow: hidden;
+  background: $color-shallowgray;
  }
  
  blockquote, q {

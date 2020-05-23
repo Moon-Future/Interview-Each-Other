@@ -116,20 +116,23 @@ export default {
   right: 0;
   background-color: $color-white;
   z-index: 99;
-  border-bottom: 1px solid $color-shallowgray;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.22);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.22);
 }
 .hedaer-menu {
   display: flex;
   justify-content: space-between;
   height: 50px;
   line-height: 50px;
-  padding: 0 10px;
+  margin: auto;
   width: 80%;
   min-width: 600px;
   user-select: none;
   .header-logo {
     cursor: pointer;
     font-family: rubik, arial;
+    color: $color-green;
+    font-weight: bold;
   }
 }
 .menu-wrapper {
@@ -137,14 +140,12 @@ export default {
   justify-content: flex-end;
   li {
     margin: 0 10px;
-    color: $color-blue;
-    font-weight: bold;
     span {
-      font-weight: bold;
       cursor: pointer;
     }
     .menu-item-login::after {
-      content: ' · ';
+      content: '';
+      margin-right: 10px;
     }
     &.user-wrapper .avatar {
       cursor: pointer;
