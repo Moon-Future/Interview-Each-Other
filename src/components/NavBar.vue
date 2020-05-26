@@ -2,8 +2,10 @@
   <nav class="nav-container">
     <ul class="page-width nav-list">
       <li v-for="(item, index) in navList" :key="index">
-        <Iconfont :icon="item.icon" />
-        <a href="">{{ item.name }}</a>
+        <div class="icon-wrapper">
+          <Iconfont :icon="item.icon" :color="item.color" />
+        </div>
+        <a href="" :class="{ active: active === index }">{{ item.name }}</a>
       </li>
     </ul>
   </nav>
@@ -16,11 +18,12 @@ export default {
   data() {
     return {
       navList: [
-        { name: '前端', icon: 'icon-html' },
-        { name: '后端', icon: 'icon-java' },
-        { name: 'Android', icon: 'icon-anzhuo' },
-        { name: 'IOS', icon: 'icon-ios' }
-      ]
+        { name: '前端', icon: 'icon-html', color: 'initial' },
+        { name: '后端', icon: 'icon-java', color: 'initial' },
+        { name: 'Android', icon: 'icon-anzhuo', color: '#67C23A' },
+        { name: 'IOS', icon: 'icon-ios', color: '#b3aeae' }
+      ],
+      active: 1
     }
   },
   components: {
@@ -33,14 +36,28 @@ export default {
 @import '@/scss/variable.scss';
 .nav-container {
   background: $color-white;
-  line-height: 40px;
+  line-height: 50px;
 }
 .nav-list {
   display: flex;
   li {
     margin-right: 20px;
+    display: flex;
+    align-items: center;
+    .icon-wrapper {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: $color-shallowgray;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
     a {
       margin-left: 5px;
+      &.active {
+        color: $color-green;
+      }
     }
   }
 }
