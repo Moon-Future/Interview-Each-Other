@@ -1,6 +1,6 @@
 <template>
-  <div class="header-container">
-    <div class="hedaer-menu">
+  <header class="header-container">
+    <div class="page-width hedaer-menu">
       <router-link class="header-logo" to="/">Interview</router-link>
       <ul class="menu-wrapper">
         <li v-if="!loginStatus">
@@ -34,7 +34,7 @@
     <div v-if="formStatus">
       <Login></Login>
     </div>
-  </div>
+  </header>
 </template>
 
 <script>
@@ -118,15 +118,14 @@ export default {
   z-index: 99;
   border-bottom: 1px solid rgba(0, 0, 0, 0.22);
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.22);
+  height: 50px;
+  box-sizing: border-box;
 }
 .hedaer-menu {
   display: flex;
   justify-content: space-between;
   height: 50px;
   line-height: 50px;
-  margin: auto;
-  width: 80%;
-  min-width: 600px;
   user-select: none;
   .header-logo {
     cursor: pointer;

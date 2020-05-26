@@ -6,6 +6,7 @@
 
 <style lang="scss">
 @import './scss/reset.scss';
+@import './scss/common.scss';
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
