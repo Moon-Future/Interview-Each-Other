@@ -35,7 +35,7 @@ export default {
   width: 100%;
 }
 .home-content {
-  margin-top: 20px;
+  margin: 20px auto;
   position: relative;
 }
 </style>

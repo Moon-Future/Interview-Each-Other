@@ -44,6 +44,7 @@ export default {
     margin-right: 20px;
     display: flex;
     align-items: center;
+    user-select: none;
     .icon-wrapper {
       width: 26px;
       height: 26px;
