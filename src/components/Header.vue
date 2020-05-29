@@ -129,6 +129,9 @@ export default {
     background-color: transparent;
     color: $color-white;
   }
+  @media screen and (max-width: 768px) {
+    background-color: $color-white;
+  }
 }
 .hedaer-menu {
   display: flex;
@@ -141,6 +144,7 @@ export default {
     font-family: rubik, arial;
     color: $color-green;
     font-weight: bold;
+    margin-left: 10px;
   }
 }
 .menu-wrapper {

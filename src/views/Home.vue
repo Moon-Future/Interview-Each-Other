@@ -1,12 +1,15 @@
 <template>
   <div class="home">
-    <div class="home-banner">
+    <div class="home-banner" :style="{ height: height + 'px' }">
       <p class="title">看再多，不如说出来</p>
       <p class="subtitle">只语音，不视频，寻找小伙伴来一起互相面试吧</p>
       <el-button type="success" @click.native="join">立即加入</el-button>
     </div>
     <Header ref="header" formStatus :transparent="transparent" />
-    <div class="container">
+    <div
+      class="container"
+      :style="{ top: (mobeil ? 50 : height - 100) + 'px' }"
+    >
       <div class="home-content page-width">
         <topic-list></topic-list>
         <right-bar></right-bar>
@@ -19,6 +22,7 @@
 import Header from '@/components/Header.vue'
 import TopicList from '@/components/TopicList.vue'
 import RightBar from '@/components/RightBar.vue'
+import { throttle } from '@/utils/util'
 
 export default {
   name: 'Home',
@@ -29,19 +33,34 @@ export default {
   },
   data() {
     return {
-      transparent: true
+      transparent: true,
+      height: 400,
+      mobeil: false
     }
   },
   created() {
     const self = this
+    this.resizeHandle()
     document.addEventListener('scroll', function(e) {
-      let scrollTop = document.documentElement.scrollTop
-      self.transparent = scrollTop >= 350 ? false : true
+      if (self.mobeil) return
+      self.transparent =
+        document.documentElement.scrollTop >= self.height - 100 ? false : true
     })
+    window.addEventListener(
+      'resize',
+      throttle(function() {
+        self.resizeHandle()
+      }, 500)
+    )
   },
   methods: {
     join() {
       this.$refs.header.login()
+    },
+    resizeHandle() {
+      this.height = Math.max(400, window.innerHeight / 2)
+      this.mobeil = window.innerWidth <= 768 ? true : false
+      this.transparent = this.mobeil ? false : true
     }
   }
 }
@@ -71,6 +90,9 @@ export default {
     margin: 20px;
     font-size: 1.4rem;
   }
+  @media screen and (max-width: 768px) {
+    display: none;
+  }
 }
 .home-bg {
   width: 100%;
@@ -80,9 +102,15 @@ export default {
   top: 350px;
   width: 100%;
   border-radius: 20px;
+  @media screen and (max-width: 768px) {
+    top: 50px;
+  }
 }
 .home-content {
   margin: 20px auto;
   position: relative;
+  @media screen and (max-width: 768px) {
+    margin: auto;
+  }
 }
 </style>

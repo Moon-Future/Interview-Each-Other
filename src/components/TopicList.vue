@@ -3,9 +3,9 @@
     <nav-bar></nav-bar>
     <ul>
       <li class="topic-item" v-for="(item, index) in topicList" :key="index">
-        <el-avatar shape="square" :size="size" :src="item.src"></el-avatar>
+        <img class="topic-avatar" :src="item.src" alt="" />
         <article class="topic-info">
-          <h3>
+          <h3 class="title">
             社区/论坛类的是不是不太行了，怎么还没看见前后端分离的成熟产品呢？
           </h3>
           <div class="topic-bottom">
@@ -32,7 +32,6 @@ export default {
   name: 'TopicList',
   data() {
     return {
-      size: 80,
       topicList: [
         {
           src: require('@/assets/avatar.jpg'),
@@ -117,11 +116,24 @@ export default {
   margin-right: 260px;
   border-radius: 4px;
   box-shadow: 0 2px 49px 0 rgba(3, 47, 137, 0.05);
+  @media screen and (max-width: 768px) {
+    margin-right: 0;
+  }
 }
 .topic-item {
   display: flex;
   padding: 20px;
   border-bottom: 1px solid $color-shallowgray;
+  .topic-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 4px;
+    flex: 0 0 auto;
+    @media screen and (max-width: 768px) {
+      width: 40px;
+      height: 40px;
+    }
+  }
 }
 .topic-info {
   margin-left: 20px;
@@ -129,6 +141,10 @@ export default {
   flex-flow: column;
   justify-content: space-between;
   text-align: left;
+  flex: 0 1 auto;
+  .title {
+    line-height: 1.5rem;
+  }
 }
 .topic-bottom span {
   margin-right: 10px;

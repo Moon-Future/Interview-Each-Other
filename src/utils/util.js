@@ -23,3 +23,17 @@ export function formatTime(date, num1 = 3, num2 = 3) {
     arr1.map(formatNumber).join('-') + ' ' + arr2.map(formatNumber).join(':')
   )
 }
+
+export function throttle(func, wait) {
+  let timeout
+  return function() {
+    let context = this
+    let args = arguments
+    if (!timeout) {
+      timeout = setTimeout(() => {
+        timeout = null
+        func.apply(context, args)
+      }, wait)
+    }
+  }
+}

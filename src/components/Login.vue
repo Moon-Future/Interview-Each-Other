@@ -2,7 +2,7 @@
   <div class="login-container">
     <el-dialog
       :title="loginFlag ? '登陆' : '注册'"
-      width="26rem"
+      custom-class="login-dialog"
       :visible="loginVisiable"
       :modal-append-to-body="false"
       :close-on-click-modal="false"
@@ -263,6 +263,12 @@ export default {
 @import '@/scss/variable.scss';
 .login-container {
   text-align: left;
+}
+/deep/ .login-dialog {
+  width: 26rem;
+  @media screen and (max-width: 768px) {
+    width: 100%;
+  }
 }
 .emailcode-wrapper {
   display: flex;
