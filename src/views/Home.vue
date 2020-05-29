@@ -58,7 +58,7 @@ export default {
       this.$refs.header.login()
     },
     resizeHandle() {
-      this.height = Math.max(400, window.innerHeight / 2)
+      this.height = Math.max(400, (window.innerHeight * 3) / 5)
       this.mobeil = window.innerWidth <= 768 ? true : false
       this.transparent = this.mobeil ? false : true
     }
@@ -72,7 +72,7 @@ export default {
 .home-banner {
   height: 400px;
   width: 100%;
-  background-image: url('../assets/home-bg.png');
+  background-image: url('../assets/home-bg.jpg');
   background-repeat: no-repeat;
   background-size: cover;
   position: relative;

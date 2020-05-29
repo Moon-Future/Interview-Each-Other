@@ -38,6 +38,9 @@ export default {
   background: $color-white;
   padding: 20px 0 0 20px;
   border-radius: 4px 4px 0 0;
+  @media screen and (max-width: 768px) {
+    display: none;
+  }
 }
 .nav-list {
   display: flex;
