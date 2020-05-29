@@ -1,5 +1,5 @@
 <template>
-  <header class="header-container">
+  <header class="header-container" :class="{ transparent: transparent }">
     <div class="page-width hedaer-menu">
       <router-link class="header-logo" to="/">Interview</router-link>
       <ul class="menu-wrapper">
@@ -46,6 +46,11 @@ export default {
   name: 'Header',
   props: {
     formStatus: {
+      type: Boolean,
+      default: false
+    },
+    // 是否透明
+    transparent: {
       type: Boolean,
       default: false
     }
@@ -120,6 +125,10 @@ export default {
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.22);
   height: 50px;
   box-sizing: border-box;
+  &.transparent {
+    background-color: transparent;
+    color: $color-white;
+  }
 }
 .hedaer-menu {
   display: flex;

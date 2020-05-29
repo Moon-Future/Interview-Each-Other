@@ -18,5 +18,6 @@ export default {
   position: absolute;
   right: 0;
   top: 0;
+  border-radius: 4px;
 }
 </style>

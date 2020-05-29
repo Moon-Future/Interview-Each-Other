@@ -1,5 +1,6 @@
 <template>
   <div class="topic-list">
+    <nav-bar></nav-bar>
     <ul>
       <li class="topic-item" v-for="(item, index) in topicList" :key="index">
         <el-avatar shape="square" :size="size" :src="item.src"></el-avatar>
@@ -25,6 +26,7 @@
 
 <script>
 import Iconfont from '@/components/Iconfont.vue'
+import NavBar from '@/components/NavBar.vue'
 
 export default {
   name: 'TopicList',
@@ -33,80 +35,67 @@ export default {
       size: 80,
       topicList: [
         {
-          src:
-            'http://img0.imgtn.bdimg.com/it/u=417706534,1312488002&fm=15&gp=0.jpg',
+          src: require('@/assets/avatar.jpg'),
           type: '前端',
           user: 'ChenLiang'
         },
         {
-          src:
-            'http://img0.imgtn.bdimg.com/it/u=417706534,1312488002&fm=15&gp=0.jpg',
+          src: require('@/assets/avatar.jpg'),
           type: '前端',
           user: 'ChenLiang'
         },
         {
-          src:
-            'http://img0.imgtn.bdimg.com/it/u=417706534,1312488002&fm=15&gp=0.jpg',
+          src: require('@/assets/avatar.jpg'),
           type: '前端',
           user: 'ChenLiang'
         },
         {
-          src:
-            'http://img0.imgtn.bdimg.com/it/u=417706534,1312488002&fm=15&gp=0.jpg',
+          src: require('@/assets/avatar.jpg'),
           type: '前端',
           user: 'ChenLiang'
         },
         {
-          src:
-            'http://img0.imgtn.bdimg.com/it/u=417706534,1312488002&fm=15&gp=0.jpg',
+          src: require('@/assets/avatar.jpg'),
           type: '前端',
           user: 'ChenLiang'
         },
         {
-          src:
-            'http://img0.imgtn.bdimg.com/it/u=417706534,1312488002&fm=15&gp=0.jpg',
+          src: require('@/assets/avatar.jpg'),
           type: '前端',
           user: 'ChenLiang'
         },
         {
-          src:
-            'http://img0.imgtn.bdimg.com/it/u=417706534,1312488002&fm=15&gp=0.jpg',
+          src: require('@/assets/avatar.jpg'),
           type: '前端',
           user: 'ChenLiang'
         },
         {
-          src:
-            'http://img0.imgtn.bdimg.com/it/u=417706534,1312488002&fm=15&gp=0.jpg',
+          src: require('@/assets/avatar.jpg'),
           type: '前端',
           user: 'ChenLiang'
         },
         {
-          src:
-            'http://img0.imgtn.bdimg.com/it/u=417706534,1312488002&fm=15&gp=0.jpg',
+          src: require('@/assets/avatar.jpg'),
           type: '前端',
           user: 'ChenLiang'
         },
         {
-          src:
-            'http://img0.imgtn.bdimg.com/it/u=417706534,1312488002&fm=15&gp=0.jpg',
+          src: require('@/assets/avatar.jpg'),
           type: '前端',
           user: 'ChenLiang'
         },
         {
-          src:
-            'http://img0.imgtn.bdimg.com/it/u=417706534,1312488002&fm=15&gp=0.jpg',
+          src: require('@/assets/avatar.jpg'),
           type: '前端',
           user: 'ChenLiang'
         },
         {
-          src:
-            'http://img0.imgtn.bdimg.com/it/u=417706534,1312488002&fm=15&gp=0.jpg',
+          src: require('@/assets/avatar.jpg'),
           type: '前端',
           user: 'ChenLiang'
         },
         {
-          src:
-            'http://img0.imgtn.bdimg.com/it/u=417706534,1312488002&fm=15&gp=0.jpg',
+          src: require('@/assets/avatar.jpg'),
           type: '前端',
           user: 'ChenLiang'
         }
@@ -114,7 +103,8 @@ export default {
     }
   },
   components: {
-    Iconfont
+    Iconfont,
+    NavBar
   }
 }
 </script>
@@ -125,7 +115,8 @@ export default {
 .topic-list {
   background: $color-white;
   margin-right: 260px;
-  border-radius: 2px;
+  border-radius: 4px;
+  box-shadow: 0 2px 49px 0 rgba(3, 47, 137, 0.05);
 }
 .topic-item {
   display: flex;

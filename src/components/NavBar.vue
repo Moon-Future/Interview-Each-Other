@@ -1,6 +1,6 @@
 <template>
   <nav class="nav-container">
-    <ul class="page-width nav-list">
+    <ul class="nav-list">
       <li v-for="(item, index) in navList" :key="index">
         <div class="icon-wrapper">
           <Iconfont :icon="item.icon" :color="item.color" />
@@ -36,7 +36,8 @@ export default {
 @import '@/scss/variable.scss';
 .nav-container {
   background: $color-white;
-  line-height: 50px;
+  padding: 20px 0 0 20px;
+  border-radius: 4px 4px 0 0;
 }
 .nav-list {
   display: flex;
