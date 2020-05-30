@@ -5,9 +5,9 @@
       <li class="topic-item" v-for="(item, index) in topicList" :key="index">
         <img class="topic-avatar" :src="item.src" alt="" />
         <article class="topic-info">
-          <h3 class="title">
+          <a class="title" href="../topicdetail?id=2">
             社区/论坛类的是不是不太行了，怎么还没看见前后端分离的成熟产品呢？
-          </h3>
+          </a>
           <div class="topic-bottom">
             <el-tag size="mini" type="info">{{ item.type }}</el-tag>
             <span class="topic-user">{{ item.user }}</span>
@@ -143,7 +143,13 @@ export default {
   text-align: left;
   flex: 0 1 auto;
   .title {
+    color: $color-black;
+    font-weight: bold;
     line-height: 1.5rem;
+    cursor: pointer;
+    &:hover {
+      text-decoration: underline;
+    }
   }
 }
 .topic-bottom span {
