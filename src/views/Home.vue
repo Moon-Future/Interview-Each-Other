@@ -23,6 +23,7 @@ import Header from '@/components/Header.vue'
 import TopicList from '@/components/TopicList.vue'
 import RightBar from '@/components/RightBar.vue'
 import { throttle } from '@/utils/util'
+import http from '@/utils/http.js'
 
 export default {
   name: 'Home',
