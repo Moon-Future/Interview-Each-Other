@@ -4,6 +4,15 @@ import { Loading, Message } from 'element-ui'
 
 const http = ''
 
+const tip = (msg, type = 'info') => {
+  Message({
+    message: msg,
+    duration: 1000,
+    type,
+    center: true
+  })
+}
+
 axios.interceptors.request.use(
   config => {
     // 每次发送请求之前判断 vuex 中是否存在 token
