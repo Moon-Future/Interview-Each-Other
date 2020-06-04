@@ -29,9 +29,13 @@ const toLogin = () => {
  * 请求失败后的错误统一处理
  * @param {Number} status 请求失败的状态码
  */
-const errorHandle = (status, other) => {
+const errorHandle = (status, message) => {
   // 状态码判断
   switch (status) {
+    // 400
+    case 400:
+      tip(message, 'error')
+      break
     // 401: 未登录状态，跳转登录页
     case 401:
       toLogin()
@@ -51,7 +55,7 @@ const errorHandle = (status, other) => {
       tip('请求的资源不存在')
       break
     default:
-      console.log(other)
+      console.log(message)
   }
 }
 
@@ -78,6 +82,7 @@ instance.interceptors.response.use(
     // 如果返回的状态码为200，说明接口请求成功，可以正常拿到数据
     // 否则的话抛出错误
     if (res.status === 200) {
+      res.data.message && tip(res.data.message, 'success')
       return Promise.resolve(res)
     } else {
       return Promise.reject(res)

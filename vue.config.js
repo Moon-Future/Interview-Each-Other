@@ -1,4 +1,15 @@
 module.exports = {
+  devServer: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:1756/api',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/api': ''
+        }
+      }
+    }
+  },
   configureWebpack: {
     externals: {
       vue: 'Vue',

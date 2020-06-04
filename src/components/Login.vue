@@ -60,7 +60,7 @@
         <span class="span-link" @click="changeFlag(false)">注册</span>
         <!-- <span class="span-link right">忘记密码</span> -->
       </div>
-      <p class="has-account" v-show="!loginFlag">
+      <p class="has-username" v-show="!loginFlag">
         <span @click="changeFlag(true)">已有账号登陆</span>
       </p>
       <div class="other-login">
@@ -79,7 +79,7 @@
 </template>
 
 <script>
-import URL from '@/serviceAPI.config'
+import API from '@/utils/api'
 import { mapGetters, mapMutations } from 'vuex'
 const crypto = require('crypto')
 
@@ -90,15 +90,15 @@ export default {
     return {
       submitting: false,
       form: {
-        account: '',
+        username: '',
         password: '',
         rePassword: '',
         emailCode: '',
-        name: '',
+        nickname: '',
         website: ''
       },
       fields: [
-        { prop: 'account', placeholder: '请输入邮箱', login: '请输入邮箱' },
+        { prop: 'username', placeholder: '请输入邮箱', login: '请输入邮箱' },
         {
           prop: 'password',
           placeholder: '请输入密码（不少于6位）',
@@ -106,7 +106,7 @@ export default {
         },
         { prop: 'rePassword', placeholder: '请重复密码' },
         { prop: 'emailCode', placeholder: '请输入邮箱验证码' },
-        { prop: 'name', placeholder: '请输入昵称' },
+        { prop: 'nickname', placeholder: '请输入昵称' },
         {
           prop: 'website',
           placeholder:
@@ -114,7 +114,7 @@ export default {
         }
       ],
       rules: {
-        account: [
+        username: [
           {
             type: 'email',
             required: true,
@@ -156,7 +156,7 @@ export default {
             }
           }
         ],
-        name: [
+        nickname: [
           { required: true, message: '请输入昵称', trigger: 'blur' },
           { min: 1, max: 10, message: '长度在 1 到 10 个字符', trigger: 'blur' }
         ]
@@ -195,8 +195,8 @@ export default {
       this.submit()
     },
     submit() {
-      const { account, password } = this.form
-      this.$refs.loginForm.validate(valid => {
+      const { username, password } = this.form
+      this.$refs.loginForm.validate(async valid => {
         if (!valid || this.submitting) {
           return false
         }
@@ -205,7 +205,7 @@ export default {
           // 登陆
           this.$http
             .post(URL.login, {
-              account: this.form.account,
+              username: this.form.username,
               password: crypto
                 .createHash('sha1')
                 .update(this.form.password.trim())
@@ -226,10 +226,10 @@ export default {
               this.submitting = false
             })
         } else {
-          // 注册
-          this.$http
-            .post(URL.register, {
-              account: this.form.account,
+          try {
+            // 注册
+            let res = await API.register({
+              username: this.form.username,
               password: crypto
                 .createHash('sha1')
                 .update(this.form.password.trim())
@@ -238,20 +238,15 @@ export default {
                 .createHash('sha1')
                 .update(this.form.rePassword.trim())
                 .digest('hex'),
-              name: this.form.name,
-              website: this.form.website
+              nickname: this.form.nickname
             })
-            .then(res => {
-              if (res.data.code === 1) {
-                this.$message.success(res.data.message)
-                this.changeFlag(true)
-                this.form.account = account
-                this.form.password = password
-              } else {
-                this.$message.error(res.data.message)
-              }
-              this.submitting = false
-            })
+            this.changeFlag(true)
+            this.form.username = username
+            this.form.password = password
+            this.submitting = false
+          } catch {
+            this.submitting = false
+          }
         }
       })
     }
@@ -283,7 +278,7 @@ export default {
     cursor: pointer;
   }
 }
-.has-account {
+.has-username {
   color: $color-green;
   text-align: center;
   margin: 15px;
