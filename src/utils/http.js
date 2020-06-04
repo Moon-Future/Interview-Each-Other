@@ -1,8 +1,7 @@
 import store from '@/store/index'
 import axios from 'axios'
+import router from '../router/index'
 import { Loading, Message } from 'element-ui'
-
-const http = ''
 
 const tip = (msg, type = 'info') => {
   Message({
@@ -13,7 +12,54 @@ const tip = (msg, type = 'info') => {
   })
 }
 
-axios.interceptors.request.use(
+/**
+ * 跳转登录页
+ * 携带当前页面路由，以期在登录页面完成登录后返回当前页面
+ */
+const toLogin = () => {
+  router.replace({
+    path: '/login',
+    query: {
+      redirect: router.currentRoute.fullPath
+    }
+  })
+}
+
+/**
+ * 请求失败后的错误统一处理
+ * @param {Number} status 请求失败的状态码
+ */
+const errorHandle = (status, other) => {
+  // 状态码判断
+  switch (status) {
+    // 401: 未登录状态，跳转登录页
+    case 401:
+      toLogin()
+      break
+    // 403 token 过期
+    // 清除 token 并跳转登录页
+    case 403:
+      tip('登录过期，请重新登录')
+      localStorage.removeItem('token')
+      // store.commit('loginSuccess', null)
+      // setTimeout(() => {
+      //   toLogin()
+      // }, 1000)
+      break
+    // 404 请求不存在
+    case 404:
+      tip('请求的资源不存在')
+      break
+    default:
+      console.log(other)
+  }
+}
+
+let instance = axios.create({ timeout: 1000 * 12 })
+instance.defaults.headers.post['Content-Type'] =
+  'application/x-www-form-urlencoded'
+
+instance.interceptors.request.use(
   config => {
     // 每次发送请求之前判断 vuex 中是否存在 token
     // 如果存在，则统一在 http 请求的 header 都加上 token，这样后台根据 token 判断你的登录情况
@@ -27,14 +73,14 @@ axios.interceptors.request.use(
   }
 )
 
-axios.interceptors.response.use(
-  response => {
+instance.interceptors.response.use(
+  res => {
     // 如果返回的状态码为200，说明接口请求成功，可以正常拿到数据
     // 否则的话抛出错误
-    if (response.status === 200) {
-      return Promise.resolve(response)
+    if (res.status === 200) {
+      return Promise.resolve(res)
     } else {
-      return Promise.reject(response)
+      return Promise.reject(res)
     }
   },
   // 服务器状态码不是2开头的的情况
@@ -42,28 +88,19 @@ axios.interceptors.response.use(
   // 然后根据返回的状态码进行一些操作，例如登录过期提示，错误提示等等
   // 下面列举几个常见的操作，其他需求可自行扩展
   error => {
-    if (error.response.status) {
-      switch (error.response.status) {
-        // 401: 未登录
-        // 未登录则跳转登录页面，并携带当前页面的路径
-        // 在登录成功后返回当前页面，这一步需要在登录页操作。
-        case 401:
-          break
-        // 403 token过期
-        // 登录过期对用户进行提示
-        // 清除本地token和清空vuex中token对象
-        // 跳转登录页面
-        case 403:
-          break
-        // 404请求不存在
-        case 404:
-          break
-        // 其他错误，直接抛出错误提示
-        default:
-      }
-      return Promise.reject(error.response)
+    const { response } = error
+    if (response) {
+      // 请求已发出，但是不在2xx的范围
+      errorHandle(response.status, response.data.message)
+      return Promise.reject(response)
+    } else {
+      // 处理断网的情况
+      // eg:请求超时或断网时，更新 state 的 network 状态
+      // network 状态在 app.vue 中控制着一个全局的断网提示组件的显示隐藏
+      // 关于断网组件中的刷新重新获取数据，会在断网组件中说明
+      // store.commit('changeNetwork', false)
     }
   }
 )
 
-export default http
+export default instance
