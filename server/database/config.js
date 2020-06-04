@@ -1,6 +1,6 @@
 // 数据库连接配置
 module.exports = {
-  host: 'localhost',
+  host: '1192',
   user: 'root',
   password: '8023',
   database: 'node_server',
