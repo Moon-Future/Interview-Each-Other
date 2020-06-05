@@ -29,6 +29,7 @@ function websiteFormat(str) {
   return websiteList
 }
 
+// 注册
 router.post('/register', async ctx => {
   try {
     let { username, password, rePassword, nickname } = ctx.request.body
@@ -83,47 +84,31 @@ router.post('/register', async ctx => {
   }
 })
 
+// 登陆
 router.post('/login', async ctx => {
   try {
-    const data = ctx.request.body
-    const { username, password } = data
+    const { username, password } = ctx.request.body
     const result = await query(
       `SELECT * FROM user WHERE username = ? AND password = ?`,
       [username, password]
     )
     if (result.length === 0) {
-      ctx.body = { code: 0, message: '用户名或密码有误' }
+      ctx.status = 400
+      ctx.body = { message: '用户名或密码有误' }
       return
     }
-    // 登陆时间
-    await query(`UPDATE user SET lastTime = ? WHERE id = ?`, [
-      Date.now(),
-      result[0].id
-    ])
-    const websiteRst = await query(
-      `SELECT * FROM user_website WHERE userID = ?`,
-      [result[0].id]
-    )
     const userInfo = {
       id: result[0].id,
       username: result[0].username,
-      name: result[0].name,
+      nickname: result[0].nickname,
       avatar: result[0].avatar,
-      createTime: result[0].createTime,
-      email: result[0].email || result[0].username,
-      website: websiteRst
+      createtime: result[0].createtime,
+      email: result[0].email || result[0].username
     }
-    if (result[0].root == 1) {
-      userInfo.root = true
-    }
-    const token = jwt.sign(userInfo, tokenConfig.privateKey, {
+    const token = jwt.sign({ userid: result[0].id }, tokenConfig.privateKey, {
       expiresIn: '7d'
     })
-    ctx.body = {
-      code: 1,
-      message: '登陆成功',
-      data: { token: 'Bearer ' + token, userInfo }
-    }
+    ctx.body = { token: 'Bearer ' + token, userInfo }
   } catch (err) {
     throw new Error(err)
   }
