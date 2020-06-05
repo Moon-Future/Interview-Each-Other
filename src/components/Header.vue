@@ -10,7 +10,7 @@
         <li v-else class="user-wrapper">
           <el-dropdown trigger="click">
             <div class="avatar">
-              <span>{{ userInfo.name }}</span>
+              <span>{{ userInfo.nickname }}</span>
               <img :src="userInfo.avatar || avatar" alt="" />
             </div>
             <el-dropdown-menu slot="dropdown" class="user-menu">
@@ -20,11 +20,20 @@
                   :key="i"
                   @click.native="goPage(item.path)"
                 >
-                  <Iconfont :icon="item.icon"></Iconfont>{{ item.name }}
+                  <Iconfont
+                    :icon="item.icon"
+                    fontSize="20"
+                    margin="0 10px 0 0"
+                  ></Iconfont
+                  >{{ item.name }}
                 </el-dropdown-item>
               </template>
               <el-dropdown-item @click.native="logout">
-                <Iconfont icon="icon-logout"></Iconfont>登出
+                <Iconfont
+                  icon="icon-logout"
+                  fontSize="20"
+                  margin="0 10px 0 0"
+                ></Iconfont>退出登陆
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -69,13 +78,13 @@ export default {
           root: true
         },
         {
-          icon: 'icon-user',
-          path: '/user/words',
-          name: '我的主页',
+          icon: 'icon-userinfo',
+          path: '/userinfo',
+          name: '个人中心',
           root: false
         }
       ],
-      avatar: ''
+      avatar: require('@/assets/avatar.jpg')
     }
   },
   computed: {
@@ -91,7 +100,6 @@ export default {
       this.setLoginFlag(false)
     },
     logout() {
-      localStorage.removeItem('token')
       this.setUserInfo({ userInfo: {}, status: false })
       if (this.$route.path !== '/') {
         this.$router.push({ path: '/' })
@@ -128,6 +136,9 @@ export default {
   &.transparent {
     background-color: transparent;
     color: $color-white;
+    .user-wrapper .avatar {
+      color: $color-white;
+    }
   }
   @media screen and (max-width: 768px) {
     background-color: $color-white;
@@ -162,6 +173,7 @@ export default {
     &.user-wrapper .avatar {
       cursor: pointer;
       display: flex;
+      color: $color-black;
       img {
         width: 40px;
         height: 40px;
@@ -174,6 +186,7 @@ export default {
 .user-menu {
   li {
     color: $color-gray;
+    display: flex;
   }
 }
 .github {

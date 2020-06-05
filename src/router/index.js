@@ -22,7 +22,15 @@ const routes = [
   {
     path: '/topicdetail',
     name: 'TopicDetail',
+    meta: {
+      scrollTop: true
+    },
     component: () => import('../views/TopicDetail.vue')
+  },
+  {
+    path: '/userinfo',
+    name: 'UserInfo',
+    component: () => import('../views/UserInfo.vue')
   },
   {
     path: '/room',
@@ -34,6 +42,13 @@ const routes = [
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    } else {
+      return { x: 0, y: 0 }
+    }
+  },
   routes
 })
 

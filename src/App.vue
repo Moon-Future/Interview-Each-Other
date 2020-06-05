@@ -1,8 +1,30 @@
 <template>
   <div id="app">
-    <router-view />
+    <keep-alive>
+      <router-view />
+    </keep-alive>
   </div>
 </template>
+
+<script>
+import { mapMutations } from 'vuex'
+
+export default {
+  name: 'App',
+  created() {
+    const token = localStorage.getItem('token')
+    const userInfo = localStorage.getItem('userInfo')
+    if (token) {
+      this.setUserInfo({ userInfo: JSON.parse(userInfo), status: true, token })
+    }
+  },
+  methods: {
+    ...mapMutations({
+      setUserInfo: 'SET_USERINFO'
+    })
+  }
+}
+</script>
 
 <style lang="scss">
 @import './scss/reset.scss';

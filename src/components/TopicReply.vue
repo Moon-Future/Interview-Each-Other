@@ -76,9 +76,6 @@ export default {
       }
     }
   },
-  mounted() {
-    console.log('this is current quill instance object', this.editor)
-  },
   computed: {
     editor() {
       return this.$refs.myQuillEditor.quill

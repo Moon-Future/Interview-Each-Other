@@ -43,7 +43,7 @@ const errorHandle = (status, message) => {
     // 403 token 过期
     // 清除 token 并跳转登录页
     case 403:
-      tip('登录过期，请重新登录')
+      tip('登录过期，请重新登录', 'error')
       localStorage.removeItem('token')
       // store.commit('loginSuccess', null)
       // setTimeout(() => {
@@ -52,7 +52,10 @@ const errorHandle = (status, message) => {
       break
     // 404 请求不存在
     case 404:
-      tip('请求的资源不存在')
+      tip('请求的资源不存在', 'error')
+      break
+    case 500:
+      tip('服务器开小差啦😅', 'error')
       break
     default:
       console.log(message)

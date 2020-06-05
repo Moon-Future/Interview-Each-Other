@@ -3,7 +3,9 @@
     <div class="home-banner" :style="{ height: height + 'px' }">
       <p class="title">看再多，不如说出来</p>
       <p class="subtitle">只语音，不视频，寻找小伙伴来一起互相面试吧</p>
-      <el-button type="success" @click.native="join">立即加入</el-button>
+      <el-button v-if="!loginStatus" type="success" @click.native="join"
+        >立即加入</el-button
+      >
     </div>
     <Header ref="header" formStatus :transparent="transparent" />
     <div
@@ -24,6 +26,7 @@ import TopicList from '@/components/TopicList.vue'
 import RightBar from '@/components/RightBar.vue'
 import { throttle } from '@/utils/util'
 import http from '@/utils/http.js'
+import { mapGetters, mapMutations } from 'vuex'
 
 export default {
   name: 'Home',
@@ -38,6 +41,9 @@ export default {
       height: 400,
       mobeil: false
     }
+  },
+  computed: {
+    ...mapGetters(['loginStatus'])
   },
   created() {
     const self = this

@@ -203,31 +203,23 @@ export default {
         this.submitting = true
         if (this.loginFlag) {
           // 登陆
-          this.$http
-            .post(URL.login, {
-              username: this.form.username,
-              password: crypto
+          try {
+            let res = await API.login(
+              this.form.username,
+              crypto
                 .createHash('sha1')
                 .update(this.form.password.trim())
                 .digest('hex')
-            })
-            .then(res => {
-              if (res.data.code === 1) {
-                this.$message.success(res.data.message)
-                const token = res.data.data.token
-                const userInfo = res.data.data.userInfo
-                // 存入token
-                localStorage.setItem('token', token)
-                this.setUserInfo({ userInfo, status: true })
-                this.setLoginVisiable(false)
-              } else {
-                this.$message.error(res.data.message)
-              }
-              this.submitting = false
-            })
+            )
+            const { token, userInfo } = res.data
+            this.setUserInfo({ userInfo, status: true, token })
+            this.setLoginVisiable(false)
+          } catch {
+            this.submitting = false
+          }
         } else {
+          // 注册
           try {
-            // 注册
             let res = await API.register({
               username: this.form.username,
               password: crypto

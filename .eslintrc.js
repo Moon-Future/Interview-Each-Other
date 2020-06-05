@@ -10,8 +10,8 @@ module.exports = {
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-    'quotes': ['warn', 'single'],
-    'semi': ['error', 'never'],
+    quotes: ['warn', 'single', { allowTemplateLiterals: true }],
+    semi: ['error', 'never'],
     'no-unused-vars': 'off'
   }
 }

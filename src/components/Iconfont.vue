@@ -1,8 +1,7 @@
 <template>
   <div
     class="icon-container"
-    :class="flag ? has - margin : ''"
-    :style="{ fontSize: fontSize + 'px', color: color }"
+    :style="{ fontSize: fontSize + 'px', color: color, margin: margin }"
   >
     <svg class="iconfont" aria-hidden="true">
       <use :xlink:href="`#${icon}`"></use>
@@ -25,9 +24,9 @@ export default {
       type: String,
       default: 'initial'
     },
-    flag: {
-      type: Boolean,
-      default: false
+    margin: {
+      type: String,
+      default: '0'
     }
   }
 }
@@ -36,8 +35,5 @@ export default {
 <style lang="scss" scoped>
 .icon-container {
   display: inline;
-  .has-margin {
-    margin: 0 10px;
-  }
 }
 </style>

@@ -5,9 +5,9 @@
       <li class="topic-item" v-for="(item, index) in topicList" :key="index">
         <img class="topic-avatar" :src="item.src" alt="" />
         <article class="topic-info">
-          <a class="title" href="../topicdetail?id=2">
+          <router-link class="title" :to="`/topicdetail?id=${index}`">
             社区/论坛类的是不是不太行了，怎么还没看见前后端分离的成熟产品呢？
-          </a>
+          </router-link>
           <div class="topic-bottom">
             <el-tag size="mini" type="info">{{ item.type }}</el-tag>
             <span class="topic-user">{{ item.user }}</span>
