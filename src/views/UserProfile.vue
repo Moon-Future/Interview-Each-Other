@@ -6,6 +6,12 @@
       </el-divider>
       <span class="editbtn">编辑</span>
     </div>
+    <div class="form">
+      <div class="form-item">
+        <label for="nickname">昵称</label>
+        <el-input class="form-input" readonly size="small"></el-input>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -37,6 +43,20 @@ export default {}
     border: 1px solid $color-gray;
     color: $color-gray;
     cursor: pointer;
+  }
+}
+.form-item {
+  text-align: left;
+  display: flex;
+  flex-flow: column;
+  label {
+    font-size: 0.8rem;
+    color: $color-gray;
+  }
+  .form-input {
+    margin-top: 10px;
+    width: 80%;
+    max-width: 300px;
   }
 }
 </style>

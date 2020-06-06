@@ -68,7 +68,7 @@ export default {
   data() {
     return {
       menuList: [
-        { text: '基本信息', icon: 'icon-user', url: '/userinfo/profile' },
+        { text: '基本信息', icon: 'icon-user', url: '/userinfo' },
         { text: '语音记录', icon: 'icon-call', url: '/userinfo/record' },
         { text: '修改密码', icon: 'icon-password', url: '/userinfo/safe' }
       ],
