@@ -46,6 +46,7 @@ import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
 import { quillEditor } from 'vue-quill-editor'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'TopicReply',
@@ -62,7 +63,7 @@ export default {
       content: '',
       editorOption: {
         // Some Quill options...
-        placeholder: '元芳，你怎么看...',
+        placeholder: '大佬，你怎么看......`',
         readOnly: true,
         formats: {},
         modules: {
@@ -79,7 +80,15 @@ export default {
   computed: {
     editor() {
       return this.$refs.myQuillEditor.quill
-    }
+    },
+    ...mapGetters(['userInfo'])
+  },
+  created() {
+    this.$set(
+      this.editorOption,
+      'placeholder',
+      `${this.userInfo.nickname || '大佬'}，你怎么看......`
+    )
   },
   methods: {
     onEditorBlur(quill) {},
