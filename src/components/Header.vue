@@ -1,50 +1,53 @@
 <template>
-  <header class="header-container" :class="{ transparent: transparent }">
-    <div class="page-width hedaer-menu">
-      <router-link class="header-logo" to="/">Interview</router-link>
-      <ul class="menu-wrapper">
-        <li v-if="!loginStatus">
-          <span class="menu-item-login" @click="login">登陆</span>
-          <span @click="register">注册</span>
-        </li>
-        <li v-else class="user-wrapper">
-          <el-dropdown trigger="click">
-            <div class="avatar">
-              <span>{{ userInfo.nickname }}</span>
-              <img :src="userInfo.avatar || avatar" alt="" />
-            </div>
-            <el-dropdown-menu slot="dropdown" class="user-menu">
-              <template v-for="(item, i) in dropdownList">
-                <el-dropdown-item
-                  v-if="(item.root && userInfo.root) || !item.root"
-                  :key="i"
-                  @click.native="goPage(item.path)"
-                >
+  <div class="header-container">
+    <header class="header-wrapper" :class="{ transparent: transparent }">
+      <div class="page-width hedaer-menu">
+        <router-link class="header-logo" to="/">Interview</router-link>
+        <ul class="menu-wrapper">
+          <li v-if="!loginStatus">
+            <span class="menu-item-login" @click="login">登陆</span>
+            <span @click="register">注册</span>
+          </li>
+          <li v-else class="user-wrapper">
+            <el-dropdown trigger="click">
+              <div class="avatar">
+                <span>{{ userInfo.nickname }}</span>
+                <img :src="userInfo.avatar || avatar" alt="" />
+              </div>
+              <el-dropdown-menu slot="dropdown" class="user-menu">
+                <template v-for="(item, i) in dropdownList">
+                  <el-dropdown-item
+                    v-if="(item.root && userInfo.root) || !item.root"
+                    :key="i"
+                    @click.native="goPage(item.path)"
+                  >
+                    <Iconfont
+                      :icon="item.icon"
+                      fontSize="20"
+                      margin="0 10px 0 0"
+                    ></Iconfont
+                    >{{ item.name }}
+                  </el-dropdown-item>
+                </template>
+                <el-dropdown-item @click.native="logout">
                   <Iconfont
-                    :icon="item.icon"
+                    icon="icon-logout"
                     fontSize="20"
                     margin="0 10px 0 0"
                   ></Iconfont
-                  >{{ item.name }}
+                  >退出登陆
                 </el-dropdown-item>
-              </template>
-              <el-dropdown-item @click.native="logout">
-                <Iconfont
-                  icon="icon-logout"
-                  fontSize="20"
-                  margin="0 10px 0 0"
-                ></Iconfont
-                >退出登陆
-              </el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
-        </li>
-      </ul>
-    </div>
-    <div v-if="formStatus">
-      <Login></Login>
-    </div>
-  </header>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </li>
+        </ul>
+      </div>
+      <div v-if="formStatus">
+        <Login></Login>
+      </div>
+    </header>
+    <div class="header-height"></div>
+  </div>
 </template>
 
 <script>
@@ -123,7 +126,7 @@ export default {
 
 <style lang="scss" scoped>
 @import '@/scss/variable.scss';
-.header-container {
+.header-wrapper {
   position: fixed;
   top: 0;
   left: 0;
@@ -192,5 +195,8 @@ export default {
 }
 .github {
   font-weight: bold;
+}
+.header-height {
+  height: 80px;
 }
 </style>

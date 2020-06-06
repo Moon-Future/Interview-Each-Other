@@ -52,7 +52,6 @@ export default {
 
 .container {
   position: relative;
-  top: 80px;
   word-break: break-all;
 }
 .left {
