@@ -157,7 +157,7 @@ export default {
   .header-logo {
     cursor: pointer;
     font-family: rubik, arial;
-    color: $color-green;
+    color: $color-base;
     font-weight: bold;
     margin-left: 10px;
   }

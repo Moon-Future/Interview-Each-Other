@@ -61,7 +61,7 @@ export default {
     a {
       margin-left: 5px;
       &.active {
-        color: $color-green;
+        color: $color-base;
       }
     }
   }

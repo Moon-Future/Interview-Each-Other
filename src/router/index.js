@@ -30,7 +30,24 @@ const routes = [
   {
     path: '/userinfo',
     name: 'UserInfo',
-    component: () => import('../views/UserInfo.vue')
+    component: () => import('../views/UserInfo.vue'),
+    children: [
+      {
+        path: '/userinfo',
+        name: 'UserProfile',
+        component: () => import('../views/UserProfile')
+      },
+      {
+        path: '/userinfo/record',
+        name: 'UserRecord',
+        component: () => import('../views/UserRecord')
+      },
+      {
+        path: '/userinfo/safe',
+        name: 'UserSafe',
+        component: () => import('../views/UserSafe')
+      }
+    ]
   },
   {
     path: '/room',

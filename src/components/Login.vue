@@ -266,12 +266,12 @@ export default {
 .form-message {
   padding: 15px 0;
   .span-link {
-    color: $color-green;
+    color: $color-base;
     cursor: pointer;
   }
 }
 .has-username {
-  color: $color-green;
+  color: $color-base;
   text-align: center;
   margin: 15px;
   span {
