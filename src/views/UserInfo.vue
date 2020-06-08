@@ -1,7 +1,7 @@
 <template>
-  <div class="userinfo-container page-width">
+  <div class="userinfo-container">
     <Header ref="header" formStatus :transparent="transparent" />
-    <div class="userinfo-base">
+    <div class="userinfo-base page-width">
       <div class="base-left">
         <img class="avatar" :src="userInfo.avatar" alt="" />
         <Iconfont
@@ -29,7 +29,7 @@
         </p>
       </div>
     </div>
-    <div class="userinfo-detail">
+    <div class="userinfo-detail page-width">
       <div class="left-menu">
         <ul>
           <router-link
@@ -89,9 +89,12 @@ export default {
 <style lang="scss" scoped>
 @import '@/scss/variable.scss';
 
+.userinfo-container {
+  background: $color-white;
+  padding-bottom: 50px;
+}
 .userinfo-base {
   display: flex;
-  background: $color-white;
   padding-top: 20px;
 }
 .base-left {
@@ -115,6 +118,7 @@ export default {
   }
 }
 .base-right {
+  max-width: 700px;
   padding: 0 10px;
   p {
     text-align: left;
@@ -133,10 +137,9 @@ export default {
   }
 }
 .userinfo-detail {
-  background: $color-white;
   border-radius: 4px;
-  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
   padding: 30px 0;
+  margin-top: 50px;
   display: flex;
   @media screen and (max-width: 768px) {
     display: block;

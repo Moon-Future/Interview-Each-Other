@@ -97,14 +97,8 @@ router.post('/login', async ctx => {
       ctx.body = { message: '用户名或密码有误' }
       return
     }
-    const userInfo = {
-      id: result[0].id,
-      username: result[0].username,
-      nickname: result[0].nickname,
-      avatar: result[0].avatar,
-      createtime: result[0].createtime,
-      email: result[0].email || result[0].username
-    }
+    const userInfo = result[0]
+    delete userInfo.password
     const token = jwt.sign({ userid: result[0].id }, tokenConfig.privateKey, {
       expiresIn: '7d'
     })
@@ -356,6 +350,16 @@ router.post('/upload', async ctx => {
       message = '上传失败'
     }
     ctx.body = { code, message, data: { avatar, token: 'Bearer ' + token } }
+  } catch (err) {
+    throw new Error(err)
+  }
+})
+
+// 获取 job 列表
+router.get('/getJob', async ctx => {
+  try {
+    const result = await query(`SELECT * FROM job WHERE off != 1`)
+    ctx.body = { jobArr: result[0] }
   } catch (err) {
     throw new Error(err)
   }

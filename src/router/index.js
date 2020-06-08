@@ -35,16 +35,25 @@ const routes = [
       {
         path: '/userinfo',
         name: 'UserProfile',
+        meta: {
+          background: '#fff'
+        },
         component: () => import('../views/UserProfile')
       },
       {
         path: '/userinfo/record',
         name: 'UserRecord',
+        meta: {
+          background: '#fff'
+        },
         component: () => import('../views/UserRecord')
       },
       {
         path: '/userinfo/safe',
         name: 'UserSafe',
+        meta: {
+          background: '#fff'
+        },
         component: () => import('../views/UserSafe')
       }
     ]
@@ -67,6 +76,14 @@ const router = new VueRouter({
     }
   },
   routes
+})
+
+router.beforeEach((to, from, next) => {
+  if (to.meta.background) {
+    window.document.body.style.background = to.meta.background
+    document.getElementById('app').style.background = to.meta.background
+  }
+  next()
 })
 
 export default router
