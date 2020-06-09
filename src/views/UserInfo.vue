@@ -4,29 +4,15 @@
     <div class="userinfo-base page-width">
       <div class="base-left">
         <img class="avatar" :src="userInfo.avatar" alt="" />
-        <Iconfont
-          class="avatar-editor"
-          icon="icon-editor"
-          fontSize="40"
-        ></Iconfont>
+        <Iconfont class="avatar-editor" icon="icon-editor" fontSize="40"></Iconfont>
       </div>
       <div class="base-right">
         <p>
           <span class="username">{{ userInfo.nickname }}</span>
-          <span class="job">前端</span>
+          <span class="job">{{ userInfo.jobm }}</span>
         </p>
-        <p>4年工作经验</p>
-        <p class="descr">
-          可能你还没有注意到，Vue 在更新 DOM
-          时是异步执行的。只要侦听到数据变化，Vue
-          将开启一个队列，并缓冲在同一事件循环中发生的所有数据变更。如果同一个
-          watcher
-          被多次触发，只会被推入到队列中一次。这种在缓冲时去除重复数据对于避免不必要的计算和
-          DOM 操作是非常重要的。然后，在下一个的事件循环“tick”中，Vue
-          刷新队列并执行实际 (已去重的) 工作。Vue 在内部对异步队列尝试使用原生的
-          Promise.then、MutationObserver 和
-          setImmediate，如果执行环境不支持，则会采用 setTimeout(fn, 0) 代替。
-        </p>
+        <p>{{ userInfo.worktime }} 年工作经验</p>
+        <p class="descr" v-for="(item, index) in profileArr" :key="index">{{ item }}</p>
       </div>
     </div>
     <div class="userinfo-detail page-width">
@@ -40,10 +26,8 @@
             :key="index"
             @click.native="changeMenu(index)"
           >
-            <Iconfont
-              :icon="`${item.icon}${index === activeIndex ? '-active' : ''}`"
-              margin="0 10px 0 0"
-            />{{ item.text }}
+            <Iconfont :icon="`${item.icon}${index === activeIndex ? '-active' : ''}`" margin="0 10px 0 0" />
+            {{ item.text }}
           </router-link>
         </ul>
       </div>
@@ -76,7 +60,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['userInfo'])
+    ...mapGetters(['userInfo']),
+    profileArr() {
+      return this.userInfo.profile.split('\n')
+    }
   },
   methods: {
     changeMenu(index) {

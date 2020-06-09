@@ -7,9 +7,11 @@ const mutations = {
     if (status) {
       localStorage.setItem('token', token)
       localStorage.setItem('userInfo', JSON.stringify(userInfo))
+      state.token = token
     } else {
       localStorage.removeItem('token')
       localStorage.removeItem('userInfo')
+      state.token = ''
     }
   },
   [types.SET_LOGINVISIABLE](state, flag) {

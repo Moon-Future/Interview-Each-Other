@@ -10,51 +10,27 @@
     >
       <el-form ref="loginForm" :model="form" :rules="rules">
         <template v-for="(field, i) in fields">
-          <el-form-item
-            :key="i"
-            v-if="!loginFlag || (loginFlag && field.login)"
-            :prop="field.prop"
-          >
+          <el-form-item :key="i" v-if="!loginFlag || (loginFlag && field.login)" :prop="field.prop">
             <template v-if="field.prop === 'emailCode'">
               <div class="emailcode-wrapper">
-                <el-input
-                  v-model="form[field.prop]"
-                  :placeholder="field.placeholder"
-                ></el-input>
+                <el-input v-model="form[field.prop]" :placeholder="field.placeholder"></el-input>
                 <el-button type="success">获取验证码</el-button>
               </div>
             </template>
             <template v-else>
               <el-input
-                :type="
-                  field.prop === 'password' || field.prop === 'rePassword'
-                    ? 'password'
-                    : 'text'
-                "
+                :type="field.prop === 'password' || field.prop === 'rePassword' ? 'password' : 'text'"
                 v-if="field.prop !== 'website'"
                 v-model="form[field.prop]"
                 :placeholder="field.login || field.placeholder"
                 @keyup.enter.native="login"
               ></el-input>
-              <el-input
-                v-else
-                type="textarea"
-                resize="none"
-                rows="5"
-                v-model="form[field.prop]"
-                :placeholder="field.placeholder"
-              ></el-input>
+              <el-input v-else type="textarea" resize="none" rows="5" v-model="form[field.prop]" :placeholder="field.placeholder"></el-input>
             </template>
           </el-form-item>
         </template>
       </el-form>
-      <el-button
-        class="submit-btn"
-        type="success"
-        :loading="submitting"
-        @click.native="submit"
-        >{{ loginFlag ? '登陆' : '注册' }}</el-button
-      >
+      <el-button class="submit-btn" type="success" :loading="submitting" @click.native="submit">{{ loginFlag ? '登陆' : '注册' }}</el-button>
       <div class="form-message" v-show="loginFlag">
         <span>没有账号？</span>
         <span class="span-link" @click="changeFlag(false)">注册</span>
@@ -67,11 +43,7 @@
         <p>第三方账号登陆：</p>
         <div class="other-list">
           <!-- <img src="https://b-gold-cdn.xitu.io/v3/static/img/wechat.e0ff124.svg" alt=""> -->
-          <img
-            src="https://b-gold-cdn.xitu.io/v3/static/img/github.547dd8a.svg"
-            alt=""
-            @click="otherLogin('github')"
-          />
+          <img src="https://b-gold-cdn.xitu.io/v3/static/img/github.547dd8a.svg" alt="" @click="otherLogin('github')" />
         </div>
       </div>
     </el-dialog>
@@ -109,8 +81,7 @@ export default {
         { prop: 'nickname', placeholder: '请输入昵称' },
         {
           prop: 'website',
-          placeholder:
-            '请输入个人网站，最多3个，逗号分割；[Github](https://github.com/Moon-Future/webpack-mvc-multipage),[知乎](www.zhihu.com)'
+          placeholder: '请输入个人网站，最多3个，逗号分割；[Github](https://github.com/Moon-Future/webpack-mvc-multipage),[知乎](www.zhihu.com)'
         }
       ],
       rules: {
@@ -181,9 +152,7 @@ export default {
     },
     otherLogin(name) {
       this.$loading()
-      const clientid = window.location.host.includes('localhost')
-        ? 'd5f5205584c80bdb5f16'
-        : '5b329c08da31f808bd35'
+      const clientid = window.location.host.includes('localhost') ? 'd5f5205584c80bdb5f16' : '5b329c08da31f808bd35'
       if (name === 'github') {
         window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientid}&scope=user:email`
       }

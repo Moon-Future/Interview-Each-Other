@@ -4,87 +4,61 @@
       <el-divider content-position="left">
         <h3 class="title">基本信息</h3>
       </el-divider>
-      <span class="editbtn" @click="readonly = !readonly">
+      <span class="editbtn" @click="editHandle">
         {{ readonly ? '编辑' : '返回' }}
       </span>
     </div>
-    <el-form
-      :model="formData"
-      label-position="left"
-      label-width="76px"
-      class="form"
-    >
+    <el-form :model="formData" :rules="readonly ? {} : rules" ref="userForm" label-position="left" label-width="76px" class="form">
       <el-form-item label="账号">
         <span class="form-text">{{ userInfo.username }}</span>
       </el-form-item>
       <el-form-item label="性别">
-        <Iconfont
-          v-if="readonly"
-          :icon="userInfo.sex === '0' ? 'icon-girl' : 'icon-boy'"
-          fontSize="30"
-        />
+        <Iconfont v-if="readonly" :icon="userInfo.sex === 0 ? 'icon-girl' : 'icon-boy'" fontSize="30" />
         <template v-else>
-          <el-radio v-model="formData.sex" label="0"
-            ><Iconfont icon="icon-girl" fontSize="30"
-          /></el-radio>
-          <el-radio v-model="formData.sex" label="1"
-            ><Iconfont icon="icon-boy" fontSize="30"
-          /></el-radio>
+          <el-radio-group v-model="formData.sex">
+            <el-radio :label="0"><Iconfont icon="icon-girl" fontSize="30" /></el-radio>
+            <el-radio :label="1"><Iconfont icon="icon-boy" fontSize="30" /></el-radio>
+          </el-radio-group>
         </template>
       </el-form-item>
-      <el-form-item label="昵称">
+      <el-form-item label="昵称" prop="nickname">
         <span class="form-text" v-if="readonly">{{ userInfo.nickname }}</span>
         <template v-else>
           <el-input v-model="formData.nickname" placeholder="昵称"></el-input>
         </template>
       </el-form-item>
       <el-form-item label="职业">
-        <span class="form-text" v-if="readonly">{{ userInfo.job }}</span>
+        <span class="form-text" v-if="readonly">{{ userInfo.jobm || '未知' }}</span>
         <template v-else>
-          <el-select v-model="jobValue" placeholder="请选择">
-            <el-option
-              v-for="item in jobArr"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            >
-            </el-option>
+          <el-select v-model="formData.job" placeholder="请选择">
+            <el-option v-for="item in jobArr" :key="item.value" :label="item.label" :value="item.value"></el-option>
           </el-select>
         </template>
       </el-form-item>
-      <el-form-item label="经验">
-        <span class="form-text" v-if="readonly">{{ userInfo.workTime }}</span>
+      <el-form-item label="经验年数">
+        <span class="form-text" v-if="readonly">{{ userInfo.worktime }} 年工作经验</span>
         <template v-else>
-          <el-select v-model="workTime" placeholder="请选择">
-            <el-option
-              v-for="item in workTimeArr"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            >
-            </el-option>
-          </el-select>
+          <el-input-number v-model="formData.worktime" controls-position="right" precision="0" :min="0" :max="20"></el-input-number>
         </template>
       </el-form-item>
-      <el-form-item label="个人宣言">
-        <span class="form-text" v-if="readonly">{{ userInfo.profile }}</span>
+      <el-form-item label="个人宣言" prop="profile">
+        <template v-if="readonly">
+          <p class="form-text" v-for="(item, index) in profileArr" :key="index">{{ item }}</p>
+        </template>
         <template v-else>
-          <el-input
-            type="textarea"
-            v-model="formData.profile"
-            placeholder="个人宣言"
-            :autosize="{ minRows: 5, maxRows: 10 }"
-          ></el-input>
+          <el-input type="textarea" v-model="formData.profile" placeholder="个人宣言" :autosize="{ minRows: 5, maxRows: 10 }"></el-input>
         </template>
       </el-form-item>
     </el-form>
-    <el-button type="success" v-if="!readonly">保存</el-button>
+    <el-button type="success" v-if="!readonly" :loading="loading" @click="save">保存</el-button>
   </div>
 </template>
 
 <script>
 import Iconfont from '@/components/Iconfont.vue'
-import { sexMap, jobArr, workTimeArr } from '@/utils/const'
+import { sexMap } from '@/utils/const'
+import API from '@/utils/api'
+import { Loading, Message } from 'element-ui'
 import { mapGetters, mapMutations } from 'vuex'
 
 export default {
@@ -95,24 +69,99 @@ export default {
     return {
       formData: {},
       sexMap: sexMap,
-      jobArr: jobArr,
-      jobValue: '',
-      workTimeArr: workTimeArr,
-      workTime: '',
-      readonly: true
+      jobArr: null,
+      worktime: '',
+      readonly: true,
+      loading: false,
+      rules: {
+        nickname: [
+          { required: true, message: '请输入昵称', trigger: 'blur' },
+          { min: 1, max: 10, message: '长度在 1 到 10 个字符', trigger: 'blur' }
+        ],
+        profile: [
+          {
+            min: 1,
+            max: 250,
+            message: '长度在 1 到 250 个字符',
+            trigger: 'blur'
+          }
+        ]
+      }
     }
   },
   computed: {
-    ...mapGetters(['userInfo'])
+    ...mapGetters(['userInfo']),
+    profileArr() {
+      return this.userInfo.profile.split('\n')
+    }
   },
-  created() {
-    this.formData = {
-      username: this.userInfo.username,
-      nickname: this.userInfo.nickname,
-      sex: this.userInfo.sex || '0',
-      job: this.userInfo.job || '',
-      worktime: this.userInfo.worktime || '',
-      profile: this.userInfo.profile || ''
+  created() {},
+  methods: {
+    ...mapMutations({
+      setUserInfo: 'SET_USERINFO'
+    }),
+    // 点击编辑
+    async editHandle() {
+      try {
+        if (this.readonly) {
+          if (!this.jobArr) {
+            let jobArr = (await API.getJob()).data
+            this.jobArr = []
+            jobArr.forEach(ele => {
+              this.jobArr.push({
+                value: ele.id,
+                label: ele.name
+              })
+            })
+          }
+          this.formData = {
+            username: this.userInfo.username,
+            nickname: this.userInfo.nickname,
+            sex: this.userInfo.sex,
+            job: this.userInfo.job || '',
+            worktime: this.userInfo.worktime || '',
+            profile: this.userInfo.profile || '',
+            info: true
+          }
+        }
+        this.readonly = !this.readonly
+      } catch (err) {
+        console.log(err)
+      }
+    },
+
+    // 保存提交
+    save() {
+      if (this.loading) return
+      this.$refs.userForm.validate(async valid => {
+        if (!valid) {
+          return false
+        }
+        if (
+          this.userInfo.nickname !== this.formData.nickname ||
+          this.userInfo.sex != this.formData.sex ||
+          this.userInfo.job !== this.formData.job ||
+          this.userInfo.worktime !== this.formData.worktime ||
+          this.userInfo.profile !== this.formData.profile
+        ) {
+          try {
+            this.loading = true
+            let res = await API.updateUserInfo(this.formData)
+            this.loading = false
+            this.setUserInfo({ userInfo: res.data.userInfo, status: true, token: res.data.token })
+            this.readonly = !this.readonly
+          } catch (err) {
+            this.loading = false
+            console.log(err)
+          }
+        } else {
+          Message({
+            message: '无需更新',
+            duration: 1000,
+            center: true
+          })
+        }
+      })
     }
   }
 }

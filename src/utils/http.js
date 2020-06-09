@@ -34,7 +34,7 @@ const errorHandle = (status, message) => {
   switch (status) {
     // 400
     case 400:
-      tip(message, 'error')
+      tip(message)
       break
     // 401: 未登录状态，跳转登录页
     case 401:
@@ -63,8 +63,7 @@ const errorHandle = (status, message) => {
 }
 
 let instance = axios.create({ timeout: 1000 * 12 })
-instance.defaults.headers.post['Content-Type'] =
-  'application/x-www-form-urlencoded'
+instance.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
 
 instance.interceptors.request.use(
   config => {

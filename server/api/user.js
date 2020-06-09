@@ -34,9 +34,7 @@ router.post('/register', async ctx => {
   try {
     let { username, password, rePassword, nickname } = ctx.request.body
     const date = Date.now()
-    const result = await query(`SELECT * FROM user WHERE username = ?`, [
-      username
-    ])
+    const result = await query(`SELECT * FROM user WHERE username = ?`, [username])
     if (result.length !== 0) {
       ctx.status = 400
       ctx.body = { message: '用户已存在' }
@@ -56,15 +54,7 @@ router.post('/register', async ctx => {
     await query(
       `INSERT INTO user (id, username, password, nickname, avatar, email, createtime) 
       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [
-        userID,
-        username.trim(),
-        password,
-        nickname.trim().slice(0, 10),
-        '',
-        username.trim(),
-        date
-      ]
+      [userID, username.trim(), password, nickname.trim().slice(0, 10), '', username.trim(), date]
     )
     ctx.body = { message: '注册成功' }
     // mailOptions.subject = 'English4Coder 有新的注册用户'
@@ -88,10 +78,10 @@ router.post('/register', async ctx => {
 router.post('/login', async ctx => {
   try {
     const { username, password } = ctx.request.body
-    const result = await query(
-      `SELECT * FROM user WHERE username = ? AND password = ?`,
-      [username, password]
-    )
+    const result = await query(`SELECT u.*, j.name as jobm FROM user u, job j WHERE u.username = ? AND u.password = ? AND u.job = j.id`, [
+      username,
+      password
+    ])
     if (result.length === 0) {
       ctx.status = 400
       ctx.body = { message: '用户名或密码有误' }
@@ -112,9 +102,7 @@ router.get('/getUserMore', async ctx => {
   try {
     const params = ctx.request.query
     const { userID } = params
-    const result = await query(`SELECT * FROM user_website WHERE userID = ?`, [
-      userID
-    ])
+    const result = await query(`SELECT * FROM user_website WHERE userID = ?`, [userID])
     ctx.body = { code: 1, data: result }
   } catch (err) {
     throw new Error(err)
@@ -169,9 +157,7 @@ router.get('/githubCallback', async ctx => {
       client_secret: githubConfig[NODE_ENV].client_secret,
       code: params.code
     })
-    const userResponse = await axios.get(
-      `${githubConfig.tokenURL}${tokenResponse.data}`
-    )
+    const userResponse = await axios.get(`${githubConfig.tokenURL}${tokenResponse.data}`)
     const userData = userResponse.data
     const userID = userData.id + 'Github'
     const date = Date.now()
@@ -214,15 +200,10 @@ router.get('/githubCallback', async ctx => {
       userInfo.createTime = result[0].createTime
     }
     // 登陆时间
-    await query(`UPDATE user SET lastTime = ? WHERE id = ?`, [
-      Date.now(),
-      userID
-    ])
+    await query(`UPDATE user SET lastTime = ? WHERE id = ?`, [Date.now(), userID])
     const token = jwt.sign(userInfo, tokenConfig.privateKey)
 
-    ctx.response.redirect(
-      githubConfig[NODE_ENV].redirect + '?token=Bearer ' + token
-    )
+    ctx.response.redirect(githubConfig[NODE_ENV].redirect + '?token=Bearer ' + token)
   } catch (err) {
     throw new Error(err)
   }
@@ -231,89 +212,65 @@ router.get('/githubCallback', async ctx => {
 router.post('/updateUserInfo', async ctx => {
   const userInfo = checkToken(ctx)
   if (!userInfo) {
-    ctx.body = { code: 0, message: '请先登陆' }
+    ctx.status = 403
+    ctx.body = { message: '请先登陆' }
     return
   }
   try {
-    const data = ctx.request.body
-    const { info, name, email, website, old, newPass, reNew } = data
-    let token,
-      flag = false
+    const { sex, nickname, job, worktime, profile, info, newPass, oldPass, reNew } = ctx.request.body
+    let userData = (await query(`SELECT * FROM user WHERE id = ?`, [userInfo.userid]))[0]
+    delete userData.password
+    // 基本信息更新
     if (info) {
-      // 信息更新
-      if (email.trim().length > 100) {
-        ctx.body = { code: 0, message: '邮箱长度在 1 到 100 个字符' }
-        return
-      }
-      // 信息是否更新
-      if (userInfo.name !== name || userInfo.email !== email) {
-        await query(`UPDATE user SET name = ?, email = ? WHERE id = ?`, [
-          name.trim().slice(0, 10),
-          email.trim(),
-          userInfo.id
+      if (
+        userData.nickname !== nickname ||
+        userData.sex != sex ||
+        userData.job !== job ||
+        userData.worktime !== worktime ||
+        userData.profile !== profile
+      ) {
+        let res = await query(`UPDATE user SET nickname = ?, sex = ?, job = ?, worktime = ?, profile = ?, updatetime = ? WHERE id = ?`, [
+          nickname.trim().slice(0, 10),
+          sex,
+          job,
+          worktime,
+          profile.trim(),
+          Date.now(),
+          userData.id
         ])
-        userInfo.name = name
-        userInfo.email = email
-        flag = true
-      }
-      // website是否更新
-      let webstr = ''
-      userInfo.website.forEach(item => {
-        webstr += `[${item.name}](${item.url})`
-      })
-      if (webstr !== website.trim().replace(/\n|,/g, '')) {
-        let websiteList = websiteFormat(website)
-        await query(`DELETE FROM user_website WHERE userID = ?`, [userInfo.id])
-        for (let i = 0, len = websiteList.length; i < len; i++) {
-          let item = websiteList[i]
-          await query(
-            `INSERT INTO user_website (id, userID, name, url, createTime)
-            VALUES (?, ?, ?, ?, ?)`,
-            [
-              shortid.generate(),
-              userInfo.id,
-              item.name,
-              item.url,
-              userInfo.createTime
-            ]
-          )
-        }
-        userInfo.website = websiteList
-        flag = true
-      }
-      if (flag) {
-        token = jwt.sign(userInfo, tokenConfig.privateKey)
+        userData = (await query(`SELECT u.*, j.name as jobm FROM user u, job j WHERE u.id = ? AND u.job = j.id`, [userInfo.userid]))[0]
+        delete userData.password
+        let token = jwt.sign({ userid: userData.id }, tokenConfig.privateKey, {
+          expiresIn: '7d'
+        })
         ctx.body = {
-          code: 1,
-          message: '信息修改成功',
-          data: { userInfo, token: 'Bearer ' + token }
+          message: '更新成功',
+          userInfo: userData,
+          token: 'Bearer ' + token
         }
       } else {
-        ctx.body = { code: 1, message: '无需更新' }
+        ctx.status = 400
+        ctx.body = { message: '无需更新' }
       }
     } else {
       // 修改密码
       if (userInfo.id.includes('Github')) {
-        ctx.body = { code: 0, message: 'Github用户' }
+        ctx.body = { message: 'Github用户' }
         return
       }
       if (newPass !== reNew) {
-        ctx.body = { code: 0, message: '两次密码不同' }
+        ctx.status = 400
+        ctx.body = { message: '两次密码不同' }
         return
       }
-      const rst = await query(
-        `SELECT * FROM user WHERE id = ? AND password = ?`,
-        [userInfo.id, old]
-      )
+      const rst = await query(`SELECT * FROM user WHERE id = ? AND password = ?`, [userInfo.id, oldPass])
       if (rst.length === 0) {
-        ctx.body = { code: 0, message: '原密码错误' }
+        ctx.status = 400
+        ctx.body = { message: '原密码错误' }
         return
       }
-      await query(`UPDATE user SET password = ? WHERE id = ?`, [
-        newPass,
-        userInfo.id
-      ])
-      ctx.body = { code: 1, message: '密码修改成功' }
+      await query(`UPDATE user SET password = ? WHERE id = ?`, [newPass, userInfo.id])
+      ctx.body = { message: '密码修改成功' }
     }
   } catch (err) {
     throw new Error(err)
@@ -341,10 +298,7 @@ router.post('/upload', async ctx => {
       avatar = 'https://' + result.Location + '?r=' + Math.random()
       userInfo.avatar = avatar
       token = jwt.sign(userInfo, tokenConfig.privateKey)
-      await query(`UPDATE user SET avatar = ? WHERE id = ?`, [
-        avatar,
-        userInfo.id
-      ])
+      await query(`UPDATE user SET avatar = ? WHERE id = ?`, [avatar, userInfo.id])
     } else {
       code = 0
       message = '上传失败'
@@ -359,7 +313,7 @@ router.post('/upload', async ctx => {
 router.get('/getJob', async ctx => {
   try {
     const result = await query(`SELECT * FROM job WHERE off != 1`)
-    ctx.body = { jobArr: result[0] }
+    ctx.body = result
   } catch (err) {
     throw new Error(err)
   }

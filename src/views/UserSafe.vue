@@ -17,13 +17,14 @@ export default {}
 @import '@/scss/variable.scss';
 
 .titlebar {
+  text-align: center;
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   .title {
     color: $color-base;
-    font-size: 2rem;
+    font-size: 1.5rem;
   }
   .editbtn {
     position: absolute;
@@ -37,6 +38,12 @@ export default {}
     border: 1px solid $color-gray;
     color: $color-gray;
     cursor: pointer;
+  }
+}
+.form {
+  text-align: left;
+  .form-text {
+    font-size: 1.2rem;
   }
 }
 </style>

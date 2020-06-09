@@ -2,7 +2,9 @@ import http from './http'
 
 const URL = {
   register: '/api/user/register', // 用户注册
-  login: '/api/user/login' // 用户登陆
+  login: '/api/user/login', // 用户登陆
+  getJob: '/api/user/getJob', // 获取职位列表
+  updateUserInfo: '/api/user/updateUserInfo' // 更新用户信息
 }
 
 const API = {
@@ -21,6 +23,19 @@ const API = {
    */
   login(username, password) {
     return http.post(URL.login, { username, password })
+  },
+
+  // 获取职位列表
+  getJob() {
+    return http.get(URL.getJob)
+  },
+
+  /**
+   * 更新用户信息
+   * @param {Object} data nickname sex job worktime profile info newPass oldPass reNew
+   */
+  updateUserInfo(data) {
+    return http.post(URL.updateUserInfo, data)
   }
 }
 
