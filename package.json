@@ -21,6 +21,7 @@
     "koa-static": "^5.0.0",
     "koa2-cors": "^2.0.6",
     "mysql": "^2.18.1",
+    "shortid": "^2.2.15",
     "trtc-js-sdk": "^4.3.14",
     "vue": "^2.6.11",
     "vue-image-crop-upload": "^2.5.0",
