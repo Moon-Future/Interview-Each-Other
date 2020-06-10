@@ -10,7 +10,9 @@
   "dependencies": {
     "axios": "^0.19.2",
     "core-js": "^3.6.4",
+    "cos-nodejs-sdk-v5": "^2.6.0",
     "element-ui": "^2.13.1",
+    "formidable": "^1.2.2",
     "jsonwebtoken": "^8.5.1",
     "koa": "^2.12.0",
     "koa-bodyparser": "^4.3.0",
@@ -21,6 +23,7 @@
     "mysql": "^2.18.1",
     "trtc-js-sdk": "^4.3.14",
     "vue": "^2.6.11",
+    "vue-image-crop-upload": "^2.5.0",
     "vue-quill-editor": "^3.0.6",
     "vue-router": "^3.1.6",
     "vuex": "^3.1.3"

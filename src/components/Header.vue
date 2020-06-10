@@ -16,26 +16,14 @@
               </div>
               <el-dropdown-menu slot="dropdown" class="user-menu">
                 <template v-for="(item, i) in dropdownList">
-                  <el-dropdown-item
-                    v-if="(item.root && userInfo.root) || !item.root"
-                    :key="i"
-                    @click.native="goPage(item.path)"
-                  >
-                    <Iconfont
-                      :icon="item.icon"
-                      fontSize="20"
-                      margin="0 10px 0 0"
-                    ></Iconfont
-                    >{{ item.name }}
+                  <el-dropdown-item v-if="(item.root && userInfo.root) || !item.root" :key="i" @click.native="goPage(item.path)">
+                    <Iconfont :icon="item.icon" fontSize="20" margin="0 10px 0 0"></Iconfont>
+                    {{ item.name }}
                   </el-dropdown-item>
                 </template>
                 <el-dropdown-item @click.native="logout">
-                  <Iconfont
-                    icon="icon-logout"
-                    fontSize="20"
-                    margin="0 10px 0 0"
-                  ></Iconfont
-                  >退出登陆
+                  <Iconfont icon="icon-logout" fontSize="20" margin="0 10px 0 0"></Iconfont>
+                  退出登陆
                 </el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
@@ -83,7 +71,7 @@ export default {
         },
         {
           icon: 'icon-userinfo',
-          path: '/userinfo',
+          path: '/userinfo/profile',
           name: '个人中心',
           root: false
         }

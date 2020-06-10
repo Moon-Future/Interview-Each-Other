@@ -1,10 +1,11 @@
 import http from './http'
 
-const URL = {
+export const URL = {
   register: '/api/user/register', // 用户注册
   login: '/api/user/login', // 用户登陆
   getJob: '/api/user/getJob', // 获取职位列表
-  updateUserInfo: '/api/user/updateUserInfo' // 更新用户信息
+  updateUserInfo: '/api/user/updateUserInfo', // 更新用户信息
+  upload: '/api/user/upload' // 图片上传
 }
 
 const API = {

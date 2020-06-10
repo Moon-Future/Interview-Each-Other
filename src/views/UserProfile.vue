@@ -179,6 +179,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-bottom: 20px;
   .title {
     color: $color-base;
     font-size: 1.5rem;
@@ -199,6 +200,7 @@ export default {
 }
 .form {
   text-align: left;
+  max-width: 500px;
   .form-text {
     font-size: 1.2rem;
   }

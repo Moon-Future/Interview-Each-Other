@@ -3,30 +3,25 @@ const router = new Router()
 const query = require('../database/init')
 const shortid = require('shortid')
 const jwt = require('jsonwebtoken')
+const formidable = require('formidable')
 const axios = require('axios')
 const { checkToken, dateFormat } = require('./util')
 const { tokenConfig, githubConfig } = require('../secret/code')
 // const { transporter, mailOptions } = require('./email')
-// const cosUpload = require('./tencentCloud')
+const cosUpload = require('./tencentCloud')
 
-function websiteFormat(str) {
-  let websiteList = []
-  let websiteSplit = str
-    .replace(/\n/g, '')
-    .trim()
-    .split(/,|;/)
-  for (let i = 0, len = websiteSplit.length; i < len; i++) {
-    let item = websiteSplit[i]
-    let name = item.match(/\[(.*?)\]/) && item.match(/\[(.*?)\]/)[1].trim()
-    let url = item.match(/\((.*?)\)/) && item.match(/\((.*?)\)/)[1].trim()
-    if (name && url) {
-      websiteList.push({ name, url })
-    }
-    if (websiteList.length === 3) {
-      break
-    }
-  }
-  return websiteList
+// 提交表单处理
+function formParse(req) {
+  let form = new formidable.IncomingForm()
+  return new Promise((resolve, reject) => {
+    form.parse(req, (error, fields, files) => {
+      if (error) {
+        reject(error)
+      } else {
+        resolve({ fields, files })
+      }
+    })
+  })
 }
 
 // 注册
@@ -89,7 +84,7 @@ router.post('/login', async ctx => {
     }
     const userInfo = result[0]
     delete userInfo.password
-    const token = jwt.sign({ userid: result[0].id }, tokenConfig.privateKey, {
+    const token = jwt.sign({ id: result[0].id }, tokenConfig.privateKey, {
       expiresIn: '7d'
     })
     ctx.body = { token: 'Bearer ' + token, userInfo }
@@ -212,13 +207,11 @@ router.get('/githubCallback', async ctx => {
 router.post('/updateUserInfo', async ctx => {
   const userInfo = checkToken(ctx)
   if (!userInfo) {
-    ctx.status = 403
-    ctx.body = { message: '请先登陆' }
     return
   }
   try {
     const { sex, nickname, job, worktime, profile, info, newPass, oldPass, reNew } = ctx.request.body
-    let userData = (await query(`SELECT * FROM user WHERE id = ?`, [userInfo.userid]))[0]
+    let userData = (await query(`SELECT * FROM user WHERE id = ?`, [userInfo.id]))[0]
     delete userData.password
     // 基本信息更新
     if (info) {
@@ -238,9 +231,9 @@ router.post('/updateUserInfo', async ctx => {
           Date.now(),
           userData.id
         ])
-        userData = (await query(`SELECT u.*, j.name as jobm FROM user u, job j WHERE u.id = ? AND u.job = j.id`, [userInfo.userid]))[0]
+        userData = (await query(`SELECT u.*, j.name as jobm FROM user u, job j WHERE u.id = ? AND u.job = j.id`, [userInfo.id]))[0]
         delete userData.password
-        let token = jwt.sign({ userid: userData.id }, tokenConfig.privateKey, {
+        let token = jwt.sign({ id: userData.id }, tokenConfig.privateKey, {
           expiresIn: '7d'
         })
         ctx.body = {
@@ -280,30 +273,22 @@ router.post('/updateUserInfo', async ctx => {
 router.post('/upload', async ctx => {
   const userInfo = checkToken(ctx)
   if (!userInfo) {
-    ctx.body = { code: 0, message: '请先登陆' }
     return
   }
   try {
-    const file = ctx.request.files.file
-    let token
-    if (file.size / 1024 > 500) {
-      ctx.body = { code: 0, message: '上传头像图片大小不能超过 500kb!' }
-      return
-    }
-    const result = await cosUpload(userInfo.id + '.jpg', file.path)
-    let avatar = '',
-      code = 1,
-      message = '上传成功'
+    const { files } = await formParse(ctx.req)
+    const avatarData = files.avatar
+    const filePath = avatarData.path
+    const fileName = '/avatar/' + userInfo.id + '.jpg'
+    const result = await cosUpload(fileName, filePath)
     if (result.statusCode === 200) {
-      avatar = 'https://' + result.Location + '?r=' + Math.random()
-      userInfo.avatar = avatar
-      token = jwt.sign(userInfo, tokenConfig.privateKey)
+      let avatar = 'https://' + result.Location
       await query(`UPDATE user SET avatar = ? WHERE id = ?`, [avatar, userInfo.id])
+      ctx.body = { message: '上传成功', avatar: avatar + '?r=' + Math.random() }
     } else {
-      code = 0
-      message = '上传失败'
+      ctx.status = 400
+      ctx.body = { message: '上传失败' }
     }
-    ctx.body = { code, message, data: { avatar, token: 'Bearer ' + token } }
   } catch (err) {
     throw new Error(err)
   }

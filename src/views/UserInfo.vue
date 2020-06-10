@@ -4,7 +4,7 @@
     <div class="userinfo-base page-width">
       <div class="base-left">
         <img class="avatar" :src="userInfo.avatar" alt="" />
-        <Iconfont class="avatar-editor" icon="icon-editor" fontSize="40"></Iconfont>
+        <Iconfont class="avatar-editor" icon="icon-editor" fontSize="40" @click.native="toggleShow"></Iconfont>
       </div>
       <div class="base-right">
         <p>
@@ -35,28 +35,48 @@
         <router-view />
       </div>
     </div>
+
+    <my-upload
+      field="avatar"
+      @crop-upload-success="cropUploadSuccess"
+      v-model="show"
+      :width="300"
+      :height="300"
+      :url="uploadUrl"
+      :headers="headers"
+      img-format="png"
+    ></my-upload>
   </div>
 </template>
 
 <script>
 import Header from '@/components/Header.vue'
 import Iconfont from '@/components/Iconfont.vue'
+import myUpload from 'vue-image-crop-upload'
+import { URL } from '@/utils/api'
+import { deepClone } from '@/utils/util'
 import { mapGetters, mapMutations } from 'vuex'
 
 export default {
   name: 'UserInfo',
   components: {
     Header,
-    Iconfont
+    Iconfont,
+    myUpload
   },
   data() {
     return {
       menuList: [
-        { text: '基本信息', icon: 'icon-user', url: '/userinfo' },
+        { text: '基本信息', icon: 'icon-user', url: '/userinfo/profile' },
         { text: '语音记录', icon: 'icon-call', url: '/userinfo/record' },
         { text: '修改密码', icon: 'icon-password', url: '/userinfo/safe' }
       ],
-      activeIndex: 0
+      activeIndex: 0,
+      uploadUrl: URL.upload,
+      show: false,
+      headers: {
+        Authorization: localStorage.getItem('token')
+      }
     }
   },
   computed: {
@@ -66,8 +86,33 @@ export default {
     }
   },
   methods: {
+    ...mapMutations({
+      setUserInfo: 'SET_USERINFO'
+    }),
     changeMenu(index) {
       this.activeIndex = index
+    },
+
+    // 显示上传组件
+    toggleShow() {
+      this.show = !this.show
+    },
+
+    // 上传成功
+    cropUploadSuccess(jsonData, field) {
+      let userInfo = deepClone(this.userInfo)
+      userInfo.avatar = jsonData.avatar
+      this.setUserInfo({ userInfo })
+    }
+  },
+  watch: {
+    '$route.path'(newPath) {
+      for (let i = 0, len = this.menuList.length; i < len; i++) {
+        if (newPath === this.menuList[i].url) {
+          this.activeIndex = i
+          break
+        }
+      }
     }
   }
 }

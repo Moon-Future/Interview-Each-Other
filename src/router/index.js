@@ -33,7 +33,7 @@ const routes = [
     component: () => import('../views/UserInfo.vue'),
     children: [
       {
-        path: '/userinfo',
+        path: '/userinfo/profile',
         name: 'UserProfile',
         meta: {
           background: '#fff'
@@ -69,7 +69,7 @@ const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
   scrollBehavior(to, from, savedPosition) {
-    if (savedPosition) {
+    if (savedPosition || to.matched[0].path === from.matched[0].path) {
       return savedPosition
     } else {
       return { x: 0, y: 0 }
@@ -82,6 +82,9 @@ router.beforeEach((to, from, next) => {
   if (to.meta.background) {
     window.document.body.style.background = to.meta.background
     document.getElementById('app').style.background = to.meta.background
+  } else {
+    window.document.body.style.background = '#F5F5F5'
+    document.getElementById('app').style.background = '#F5F5F5'
   }
   next()
 })
