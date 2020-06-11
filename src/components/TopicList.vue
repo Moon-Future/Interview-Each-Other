@@ -23,6 +23,7 @@
 <script>
 import Iconfont from '@/components/Iconfont.vue'
 import NavBar from '@/components/NavBar.vue'
+import { formatTime } from '@/utils/util'
 import API from '@/utils/api'
 
 export default {
@@ -62,7 +63,11 @@ export default {
       } else if (hours <= 0) {
         return `${minutes} 分钟前`
       } else if (days <= 0) {
-        return `${hours} 小时 ${minutes % 60} 分钟前`
+        return formatTime(new Date(timestamp), 0, 2)
+      } else if (days == 1) {
+        return `昨天${formatTime(new Date(timestamp), 0, 2)}`
+      } else {
+        return formatTime(new Date(timestamp), 3, 2)
       }
     }
   }
