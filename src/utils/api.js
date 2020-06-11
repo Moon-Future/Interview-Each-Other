@@ -5,7 +5,10 @@ export const URL = {
   login: '/api/user/login', // 用户登陆
   getJob: '/api/user/getJob', // 获取职位列表
   updateUserInfo: '/api/user/updateUserInfo', // 更新用户信息
-  upload: '/api/user/upload' // 图片上传
+  upload: '/api/user/upload', // 图片上传
+
+  wirte: '/api/topic/write', // 发表主题
+  getTopic: '/api/topic/getTopic' // 获取主题列表
 }
 
 const API = {
@@ -37,6 +40,20 @@ const API = {
    */
   updateUserInfo(data) {
     return http.post(URL.updateUserInfo, data)
+  },
+
+  /**
+   * 发表主题
+   */
+  write(data) {
+    return http.post(URL.wirte, data)
+  },
+
+  /**
+   * 获取主题列表
+   */
+  getTopic() {
+    return http.get(URL.getTopic)
   }
 }
 

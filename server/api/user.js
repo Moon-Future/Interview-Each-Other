@@ -4,7 +4,6 @@ const query = require('../database/init')
 const shortid = require('shortid')
 const jwt = require('jsonwebtoken')
 const formidable = require('formidable')
-const axios = require('axios')
 const { checkToken, dateFormat } = require('./util')
 const { tokenConfig, githubConfig } = require('../secret/code')
 // const { transporter, mailOptions } = require('./email')
@@ -46,10 +45,11 @@ router.post('/register', async ctx => {
       return
     }
     let userID = shortid.generate()
+    let avatar = 'https://interview-1255423800.cos.ap-guangzhou.myqcloud.com/avatar/default.jpg'
     await query(
       `INSERT INTO user (id, username, password, nickname, avatar, email, createtime) 
       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [userID, username.trim(), password, nickname.trim().slice(0, 10), '', username.trim(), date]
+      [userID, username.trim(), password, nickname.trim().slice(0, 10), avatar, username.trim(), date]
     )
     ctx.body = { message: '注册成功' }
     // mailOptions.subject = 'English4Coder 有新的注册用户'
@@ -141,69 +141,7 @@ router.get('/getUser', async ctx => {
   }
 })
 
-// Github授权登陆
-router.get('/githubCallback', async ctx => {
-  try {
-    const host = ctx.get('host')
-    const NODE_ENV = host.includes('localhost') ? 'dev' : 'pro' // dev, pro
-    const params = ctx.request.query
-    const tokenResponse = await axios.post(githubConfig.accessURL, {
-      client_id: githubConfig[NODE_ENV].client_id,
-      client_secret: githubConfig[NODE_ENV].client_secret,
-      code: params.code
-    })
-    const userResponse = await axios.get(`${githubConfig.tokenURL}${tokenResponse.data}`)
-    const userData = userResponse.data
-    const userID = userData.id + 'Github'
-    const date = Date.now()
-    let userInfo = {
-      id: userID,
-      username: 'Github',
-      name: userData.name,
-      avatar: userData.avatar_url,
-      email: userData.email
-    }
-    let websiteList = [{ name: 'Github', url: userData.html_url }]
-    if (userData.blog) {
-      websiteList.push({ name: 'Blog', url: userData.blog })
-    }
-    userInfo.website = websiteList
-
-    // 注册
-    const result = await query(`SELECT * FROM user WHERE id = ?`, [userID])
-    if (result.length === 0) {
-      await query(
-        `INSERT INTO user (id, name, avatar, email, createTime) 
-        VALUES (?, ?, ?, ?, ?)`,
-        [userID, userInfo.name, userInfo.avatar, userInfo.email, date]
-      )
-      for (let i = 0, len = websiteList.length; i < len; i++) {
-        let item = websiteList[i]
-        await query(
-          `INSERT INTO user_website (id, userID, name, url, createTime) 
-          VALUES (?, ?, ?, ?, ?)`,
-          [shortid.generate(), userID, item.name, item.url, date]
-        )
-      }
-    } else {
-      if (result[0].root == 1) {
-        userInfo.root = true
-      }
-      userInfo.avatar = result[0].avatar
-      userInfo.name = result[0].name
-      userInfo.email = result[0].email
-      userInfo.createTime = result[0].createTime
-    }
-    // 登陆时间
-    await query(`UPDATE user SET lastTime = ? WHERE id = ?`, [Date.now(), userID])
-    const token = jwt.sign(userInfo, tokenConfig.privateKey)
-
-    ctx.response.redirect(githubConfig[NODE_ENV].redirect + '?token=Bearer ' + token)
-  } catch (err) {
-    throw new Error(err)
-  }
-})
-
+// 更新用户信息
 router.post('/updateUserInfo', async ctx => {
   const userInfo = checkToken(ctx)
   if (!userInfo) {
@@ -270,6 +208,7 @@ router.post('/updateUserInfo', async ctx => {
   }
 })
 
+// 上传头像
 router.post('/upload', async ctx => {
   const userInfo = checkToken(ctx)
   if (!userInfo) {

@@ -3,20 +3,16 @@
     <nav-bar></nav-bar>
     <ul>
       <li class="topic-item" v-for="(item, index) in topicList" :key="index">
-        <img class="topic-avatar" :src="item.src" alt="" />
+        <img class="topic-avatar" :src="item.avatar" alt="" />
         <article class="topic-info">
-          <router-link class="title" :to="`/topicdetail?id=${index}`">
-            社区/论坛类的是不是不太行了，怎么还没看见前后端分离的成熟产品呢？
+          <router-link class="title" :to="`/topicdetail?id=${item.id}`">
+            {{ item.title }}
           </router-link>
           <div class="topic-bottom">
-            <el-tag size="mini" type="info">{{ item.type }}</el-tag>
-            <span class="topic-user">{{ item.user }}</span>
-            <span>4 分钟前</span>
-            <Iconfont
-              :icon="'icon-call'"
-              :fontSize="20"
-              :color="'#909399'"
-            ></Iconfont>
+            <el-tag size="mini" type="info">{{ item.jobm }}</el-tag>
+            <span class="topic-user">{{ item.nickname }}</span>
+            <span>{{ item.beforeTime }}</span>
+            <Iconfont :icon="'icon-call'" :fontSize="20" :color="'#909399'"></Iconfont>
           </div>
         </article>
       </li>
@@ -27,83 +23,48 @@
 <script>
 import Iconfont from '@/components/Iconfont.vue'
 import NavBar from '@/components/NavBar.vue'
+import API from '@/utils/api'
 
 export default {
   name: 'TopicList',
-  data() {
-    return {
-      topicList: [
-        {
-          src: require('@/assets/avatar.jpg'),
-          type: '前端',
-          user: 'ChenLiang'
-        },
-        {
-          src: require('@/assets/avatar.jpg'),
-          type: '前端',
-          user: 'ChenLiang'
-        },
-        {
-          src: require('@/assets/avatar.jpg'),
-          type: '前端',
-          user: 'ChenLiang'
-        },
-        {
-          src: require('@/assets/avatar.jpg'),
-          type: '前端',
-          user: 'ChenLiang'
-        },
-        {
-          src: require('@/assets/avatar.jpg'),
-          type: '前端',
-          user: 'ChenLiang'
-        },
-        {
-          src: require('@/assets/avatar.jpg'),
-          type: '前端',
-          user: 'ChenLiang'
-        },
-        {
-          src: require('@/assets/avatar.jpg'),
-          type: '前端',
-          user: 'ChenLiang'
-        },
-        {
-          src: require('@/assets/avatar.jpg'),
-          type: '前端',
-          user: 'ChenLiang'
-        },
-        {
-          src: require('@/assets/avatar.jpg'),
-          type: '前端',
-          user: 'ChenLiang'
-        },
-        {
-          src: require('@/assets/avatar.jpg'),
-          type: '前端',
-          user: 'ChenLiang'
-        },
-        {
-          src: require('@/assets/avatar.jpg'),
-          type: '前端',
-          user: 'ChenLiang'
-        },
-        {
-          src: require('@/assets/avatar.jpg'),
-          type: '前端',
-          user: 'ChenLiang'
-        },
-        {
-          src: require('@/assets/avatar.jpg'),
-          type: '前端',
-          user: 'ChenLiang'
-        }
-      ]
-    }
-  },
   components: {
     Iconfont,
     NavBar
+  },
+  data() {
+    return {
+      topicList: []
+    }
+  },
+  created() {
+    this.getTopic()
+  },
+  methods: {
+    async getTopic() {
+      try {
+        let result = await API.getTopic()
+        this.topicList = result.data.topicList
+        this.topicList.forEach(ele => {
+          ele.beforeTime = this.beforeTime(ele.createtime)
+        })
+      } catch (err) {
+        console.log(err)
+      }
+    },
+    beforeTime(timestamp) {
+      let diff = Date.now() - timestamp
+      let seconds = diff / 1000
+      let minutes = Math.floor(seconds / 60)
+      let hours = Math.floor(minutes / 60)
+      let days = Math.floor(hours / 24)
+      if (minutes <= 0) {
+        return '刚刚'
+      } else if (hours <= 0) {
+        return `${minutes} 分钟前`
+      } else if (days <= 0) {
+        return `${hours} 小时 ${minutes % 60} 分钟前`
+      }
+    }
   }
 }
 </script>
@@ -116,6 +77,7 @@ export default {
   margin-right: 260px;
   border-radius: 4px;
   box-shadow: 0 2px 49px 0 rgba(3, 47, 137, 0.05);
+  min-height: 500px;
   @media screen and (max-width: 768px) {
     margin-right: 0;
   }

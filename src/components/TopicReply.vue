@@ -5,17 +5,15 @@
         <div class="user-info">
           <img class="avatar" :src="obj.src" />
           <div class="reply-title">
-            <span class="username"> 1 XanderChen</span>
-            <span class="replytime"> 4 分钟前</span>
+            <span class="username">1 XanderChen</span>
+            <span class="replytime">4 分钟前</span>
           </div>
         </div>
         <div class="reply-content">
           <p>曾经也是这样, 不过不是因为想暴富而是纯属想抢注。</p>
           <p>
-            直到我开始把域名纳入 "订阅" 记账范围, 最终发现自己的域名, 其实就是
-            "毫无价值的撒钱"。它不会给我带来任何形式的利益,
-            支付的几百块其实完全就是撒出去了。就算我拿这钱到某个群里发个红包,
-            它的回馈都会比我买域名的回馈多得多。
+            直到我开始把域名纳入 "订阅" 记账范围, 最终发现自己的域名, 其实就是 "毫无价值的撒钱"。它不会给我带来任何形式的利益,
+            支付的几百块其实完全就是撒出去了。就算我拿这钱到某个群里发个红包, 它的回馈都会比我买域名的回馈多得多。
           </p>
         </div>
       </div>
@@ -63,7 +61,7 @@ export default {
       content: '',
       editorOption: {
         // Some Quill options...
-        placeholder: '大佬，你怎么看......`',
+        placeholder: '大佬，你怎么看......',
         readOnly: true,
         formats: {},
         modules: {
@@ -84,11 +82,7 @@ export default {
     ...mapGetters(['userInfo'])
   },
   created() {
-    this.$set(
-      this.editorOption,
-      'placeholder',
-      `${this.userInfo.nickname || '大佬'}，你怎么看......`
-    )
+    this.$set(this.editorOption, 'placeholder', `${this.userInfo.nickname || '大佬'}，你怎么看......`)
   },
   methods: {
     onEditorBlur(quill) {},

@@ -102,6 +102,7 @@ export default {
   border-radius: 4px;
   padding: 10px;
   box-sizing: border-box;
+  margin-bottom: 20px;
   @media screen and (max-width: 768px) {
     display: none;
   }

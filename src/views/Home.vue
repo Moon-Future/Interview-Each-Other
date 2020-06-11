@@ -3,15 +3,10 @@
     <div class="home-banner" :style="{ height: height + 'px' }">
       <p class="title">看再多，不如说出来</p>
       <p class="subtitle">只语音，不视频，寻找小伙伴来一起互相面试吧</p>
-      <el-button v-if="!loginStatus" type="success" @click.native="join"
-        >立即加入</el-button
-      >
+      <el-button v-if="!loginStatus" type="success" @click.native="join">立即加入</el-button>
     </div>
     <Header ref="header" formStatus :transparent="transparent" />
-    <div
-      class="container"
-      :style="{ top: (mobeil ? 50 : height - 100) + 'px' }"
-    >
+    <div class="container" :style="{ top: (mobeil ? 50 : height - 100) + 'px' }">
       <div class="home-content page-width">
         <topic-list></topic-list>
         <right-bar></right-bar>
@@ -50,8 +45,7 @@ export default {
     this.resizeHandle()
     document.addEventListener('scroll', function(e) {
       if (self.mobeil) return
-      self.transparent =
-        document.documentElement.scrollTop >= self.height - 100 ? false : true
+      self.transparent = document.documentElement.scrollTop >= self.height - 100 ? false : true
     })
     window.addEventListener(
       'resize',

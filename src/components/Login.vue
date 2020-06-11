@@ -20,12 +20,10 @@
             <template v-else>
               <el-input
                 :type="field.prop === 'password' || field.prop === 'rePassword' ? 'password' : 'text'"
-                v-if="field.prop !== 'website'"
                 v-model="form[field.prop]"
                 :placeholder="field.login || field.placeholder"
                 @keyup.enter.native="login"
               ></el-input>
-              <el-input v-else type="textarea" resize="none" rows="5" v-model="form[field.prop]" :placeholder="field.placeholder"></el-input>
             </template>
           </el-form-item>
         </template>
@@ -39,13 +37,13 @@
       <p class="has-username" v-show="!loginFlag">
         <span @click="changeFlag(true)">已有账号登陆</span>
       </p>
-      <div class="other-login">
+      <!-- <div class="other-login">
         <p>第三方账号登陆：</p>
         <div class="other-list">
-          <!-- <img src="https://b-gold-cdn.xitu.io/v3/static/img/wechat.e0ff124.svg" alt=""> -->
+          <img src="https://b-gold-cdn.xitu.io/v3/static/img/wechat.e0ff124.svg" alt="">
           <img src="https://b-gold-cdn.xitu.io/v3/static/img/github.547dd8a.svg" alt="" @click="otherLogin('github')" />
         </div>
-      </div>
+      </div> -->
     </el-dialog>
   </div>
 </template>
@@ -78,11 +76,7 @@ export default {
         },
         { prop: 'rePassword', placeholder: '请重复密码' },
         { prop: 'emailCode', placeholder: '请输入邮箱验证码' },
-        { prop: 'nickname', placeholder: '请输入昵称' },
-        {
-          prop: 'website',
-          placeholder: '请输入个人网站，最多3个，逗号分割；[Github](https://github.com/Moon-Future/webpack-mvc-multipage),[知乎](www.zhihu.com)'
-        }
+        { prop: 'nickname', placeholder: '请输入昵称' }
       ],
       rules: {
         username: [

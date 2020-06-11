@@ -74,6 +74,12 @@ export default {
           path: '/userinfo/profile',
           name: '个人中心',
           root: false
+        },
+        {
+          icon: 'icon-wirte',
+          path: '/write',
+          name: '发表主题',
+          root: false
         }
       ],
       avatar: require('@/assets/avatar.jpg')
@@ -130,6 +136,7 @@ export default {
     color: $color-white;
     .user-wrapper .avatar {
       color: $color-white;
+      outline: none;
     }
   }
   @media screen and (max-width: 768px) {
