@@ -11,7 +11,9 @@
           <div class="topic-bottom">
             <el-tag size="mini" type="info">{{ item.jobm }}</el-tag>
             <span class="topic-user">{{ item.nickname }}</span>
-            <span>{{ item.beforeTime }}</span>
+            <el-tooltip effect="light" :content="item.createtime" placement="top-start">
+              <span>{{ item.beforeTime }}</span>
+            </el-tooltip>
             <Iconfont :icon="'icon-call'" :fontSize="20" :color="'#909399'"></Iconfont>
           </div>
         </article>
@@ -47,6 +49,7 @@ export default {
         this.topicList = result.data.topicList
         this.topicList.forEach(ele => {
           ele.beforeTime = this.beforeTime(ele.createtime)
+          ele.createtime = formatTime(new Date(ele.createtime), 3, 2)
         })
       } catch (err) {
         console.log(err)
@@ -62,10 +65,8 @@ export default {
         return '刚刚'
       } else if (hours <= 0) {
         return `${minutes} 分钟前`
-      } else if (days <= 0) {
-        return formatTime(new Date(timestamp), 0, 2)
-      } else if (days == 1) {
-        return `昨天${formatTime(new Date(timestamp), 0, 2)}`
+      } else if (days < 1) {
+        return `${hours} 小时 ${minutes % 60} 分钟前`
       } else {
         return formatTime(new Date(timestamp), 3, 2)
       }

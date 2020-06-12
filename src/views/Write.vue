@@ -2,12 +2,19 @@
   <div class="write-container page-width">
     <Header ref="header" formStatus />
     <el-form :model="formData" :rules="rules" ref="writeForm">
-      <el-form-item label="主题" prop="title">
-        <el-input v-model="formData.title"></el-input>
+      <el-form-item prop="title">
+        <p class="label-text">
+          <label>主题</label>
+          <span>{{ titleLen }}/100</span>
+        </p>
+        <el-input v-model="formData.title" @input="inputTitle"></el-input>
       </el-form-item>
       <el-form-item prop="content">
-        <p class="label-text"><label>内容</label></p>
-        <quill-editor ref="myQuillEditor" v-model="formData.content" :options="editorOption" />
+        <p class="label-text">
+          <label>内容</label>
+          <span>{{ contentLen }}/2000</span>
+        </p>
+        <quill-editor ref="myQuillEditor" v-model="formData.content" :options="editorOption" @change="onEditorChange" />
       </el-form-item>
     </el-form>
     <div class="submit-btn">
@@ -38,12 +45,28 @@ export default {
         title: '',
         content: ''
       },
+      text: '',
+      titleLen: 0,
+      contentLen: 0,
       rules: {
         title: [
           { required: true, message: '请输入主题', trigger: 'blur' },
           { min: 1, max: 100, message: '长度在 1 到 100 个字符', trigger: 'blur' }
         ],
-        content: [{ required: true, message: '请输入内容', trigger: 'blur' }]
+        content: [
+          {
+            required: true,
+            validator: (rule, value, callback) => {
+              if (value.trim() === '') {
+                callback(new Error('请输入内容'))
+              } else if (this.text.length > 2000) {
+                callback(new Error('长度在 1 到 2000 个字符'))
+              } else {
+                callback()
+              }
+            }
+          }
+        ]
       },
       editorOption: {
         // Some Quill options...
@@ -62,12 +85,14 @@ export default {
       loading: false
     }
   },
-  computed: {
-    editor() {
-      return this.$refs.myQuillEditor.quill
-    }
-  },
   methods: {
+    inputTitle(value) {
+      this.titleLen = value.length
+    },
+    onEditorChange({ quill, html, text }) {
+      this.text = text.trim()
+      this.contentLen = this.text.length
+    },
     submit() {
       if (this.loading) return
       this.$refs.writeForm.validate(async valid => {
@@ -95,6 +120,9 @@ export default {
 .label-text {
   text-align: left;
   color: #606266;
+  span {
+    margin-left: 20px;
+  }
 }
 .quill-editor {
   background: #fff;
