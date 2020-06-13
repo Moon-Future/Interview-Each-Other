@@ -7,16 +7,12 @@
           <div class="topic-header">
             <div class="header-left">
               <h3 class="title">
-                社区/论坛类的是不是不太行了，怎么还没看见前后端分离的成熟产品呢？
+                {{ topicData.title }}
               </h3>
             </div>
-            <img class="avatar" :src="topic.src" alt="" />
+            <img class="avatar" :src="topicData.avatar" alt="" />
           </div>
-          <div class="topic-content">
-            <p>每天写代码不能进步</p>
-            <p>如果作为产品或者其他的 能想到把积累的数据产生回报</p>
-            <p>程序员如何往这方面发展呢 比如我有一个 idea</p>
-          </div>
+          <div class="topic-content" v-html="topicData.content"></div>
         </div>
         <topic-reply></topic-reply>
       </div>
@@ -29,6 +25,7 @@
 import Header from '@/components/Header.vue'
 import RightBar from '@/components/RightBar.vue'
 import TopicReply from '@/components/TopicReply.vue'
+import API from '@/utils/api'
 
 export default {
   name: 'TopicDetail',
@@ -41,6 +38,22 @@ export default {
     return {
       topic: {
         src: require('@/assets/avatar.jpg')
+      },
+      topicId: '',
+      topicData: {}
+    }
+  },
+  activated() {
+    this.topicData = {}
+    this.getTopicContent()
+  },
+  methods: {
+    async getTopicContent() {
+      try {
+        let res = await API.getTopicContent(this.$route.params.id)
+        this.topicData = res.data.data
+      } catch (err) {
+        console.log(err)
       }
     }
   }

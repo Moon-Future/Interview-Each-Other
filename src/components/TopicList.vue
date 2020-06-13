@@ -5,7 +5,7 @@
       <li class="topic-item" v-for="(item, index) in topicList" :key="index">
         <img class="topic-avatar" :src="item.avatar" alt="" />
         <article class="topic-info">
-          <router-link class="title" :to="`/topicdetail?id=${item.id}`">
+          <router-link class="title" :to="`/topicdetail/${item.id}`">
             {{ item.title }}
           </router-link>
           <div class="topic-bottom">

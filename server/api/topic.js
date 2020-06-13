@@ -39,7 +39,7 @@ router.post('/write', async ctx => {
         content = content.replace(reg, strAdd('*', ele.word.length))
       })
     }
-    await query(`INSERT INTO topic (id, title, content, userid, createtime) VALUES (?, ?, ?, ?, ?)`, [
+    await query(`INSERT INTO topic (id, title, content, user, createtime) VALUES (?, ?, ?, ?, ?)`, [
       shortid.generate(),
       title,
       content,
@@ -56,9 +56,53 @@ router.post('/write', async ctx => {
 router.get('/getTopic', async ctx => {
   try {
     let result = await query(
-      `SELECT t.id, t.title, t.userid as user, t.createtime, u.nickname, u.avatar, u.sex, j.id as job, j.name as jobm FROM topic as t, user as u, job as j WHERE t.off != 1 AND t.userid = u.id AND u.job = j.id`
+      `SELECT t.id, t.title, t.user as user, t.createtime, u.nickname, u.avatar, u.sex, j.id as job, j.name as jobm FROM topic as t, user as u, job as j WHERE t.off != 1 AND t.user = u.id AND u.job = j.id`
     )
     ctx.body = { topicList: result }
+  } catch (err) {
+    throw new Error(err)
+  }
+})
+
+// 获取主题内容
+router.get('/getContent', async ctx => {
+  try {
+    let { topic } = ctx.request.query
+    let result = await query(`SELECT t.*, u.avatar, u.nickname FROM topic t, user u WHERE t.id = ? AND t.user = u.id AND t.off != 1`, [topic])
+    ctx.body = { data: result[0] || {} }
+  } catch (err) {
+    throw new Error(err)
+  }
+})
+
+// 插入主题回复
+router.post('/writeReply', async ctx => {
+  let userInfo = checkToken(ctx)
+  if (!userInfo) {
+    return
+  }
+  try {
+    let { content, topic } = ctx.request.body
+    let id = shortid.generate()
+    await query(`INSERT INTO reply (id, content, topic, user, createtime) VALUES (?, ?, ?, ?, ?)`, [
+      id,
+      content.trim(),
+      topic,
+      userInfo.id,
+      Date.now()
+    ])
+    ctx.body = { data: { id: id } }
+  } catch (err) {
+    throw new Error(err)
+  }
+})
+
+// 获取主题回复
+router.get('/getReply', async ctx => {
+  try {
+    let { topic } = ctx.request.query
+    let result = await query(`SELECT r.*, u.avatar, u.nickname FROM reply r, user u WHERE r.topic = ? AND r.off != 1 AND r.user = u.id`, [topic])
+    ctx.body = { data: result }
   } catch (err) {
     throw new Error(err)
   }

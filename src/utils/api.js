@@ -8,7 +8,10 @@ export const URL = {
   upload: '/api/user/upload', // 图片上传
 
   wirte: '/api/topic/write', // 发表主题
-  getTopic: '/api/topic/getTopic' // 获取主题列表
+  getTopic: '/api/topic/getTopic', // 获取主题列表
+  getTopicContent: '/api/topic/getContent', // 获取主题内容
+  writeReply: '/api/topic/writeReply', // 评论
+  getReply: '/api/topic/getReply' // 获取评论列表
 }
 
 const API = {
@@ -54,6 +57,27 @@ const API = {
    */
   getTopic() {
     return http.get(URL.getTopic)
+  },
+
+  /**
+   * 获取主题内容
+   */
+  getTopicContent(topicId) {
+    return http.get(URL.getTopicContent, { params: { topic: topicId } })
+  },
+
+  /**
+   * 评论
+   */
+  writeReply(topicId, content) {
+    return http.post(URL.writeReply, { topic: topicId, content })
+  },
+
+  /**
+   * 获取评论列表
+   */
+  getReply(topicId) {
+    return http.get(URL.getReply, { params: { topic: topicId } })
   }
 }
 

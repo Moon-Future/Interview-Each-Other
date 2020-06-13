@@ -1,26 +1,20 @@
 <template>
   <div class="topic-reply">
     <div class="reply-text">
-      <div class="reply-item" v-for="(item, index) in arr" :key="index">
+      <div class="reply-item" v-for="(item, index) in replyData" :key="index">
         <div class="user-info">
-          <img class="avatar" :src="obj.src" />
+          <img class="avatar" :src="item.avatar || defaultAvatar" />
           <div class="reply-title">
             <span class="username">1 XanderChen</span>
             <span class="replytime">4 分钟前</span>
           </div>
         </div>
-        <div class="reply-content">
-          <p>曾经也是这样, 不过不是因为想暴富而是纯属想抢注。</p>
-          <p>
-            直到我开始把域名纳入 "订阅" 记账范围, 最终发现自己的域名, 其实就是 "毫无价值的撒钱"。它不会给我带来任何形式的利益,
-            支付的几百块其实完全就是撒出去了。就算我拿这钱到某个群里发个红包, 它的回馈都会比我买域名的回馈多得多。
-          </p>
-        </div>
+        <div class="reply-content" v-html="item.content"></div>
       </div>
     </div>
     <div class="reply-textraea">
       <div class="reply-textraea-01">
-        <img class="avatar" :src="obj.src" />
+        <img class="avatar" :src="userInfo.avatar || defaultAvatar" />
         <div class="reply-editor">
           <quill-editor
             ref="myQuillEditor"
@@ -33,7 +27,7 @@
         </div>
       </div>
       <div class="reply-btn">
-        <el-button type="success">发射</el-button>
+        <el-button type="success" @click="writeReply" :loading="loading">发射</el-button>
       </div>
     </div>
   </div>
@@ -45,6 +39,7 @@ import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
 import { quillEditor } from 'vue-quill-editor'
 import { mapGetters } from 'vuex'
+import API from '@/utils/api'
 
 export default {
   name: 'TopicReply',
@@ -53,11 +48,7 @@ export default {
   },
   data() {
     return {
-      obj: {
-        src: require('@/assets/avatar.jpg')
-      },
-      arr: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-      replyContent: '',
+      defaultAvatar: require('@/assets/avatar.jpg'),
       content: '',
       editorOption: {
         // Some Quill options...
@@ -72,7 +63,9 @@ export default {
             ['clean']
           ]
         }
-      }
+      },
+      replyData: [],
+      loading: false
     }
   },
   computed: {
@@ -81,16 +74,44 @@ export default {
     },
     ...mapGetters(['userInfo'])
   },
-  created() {
+  activated() {
     this.$set(this.editorOption, 'placeholder', `${this.userInfo.nickname || '大佬'}，你怎么看......`)
+    this.getReply()
   },
   methods: {
     onEditorBlur(quill) {},
     onEditorFocus(quill) {},
     onEditorReady(quill) {},
     onEditorChange({ quill, html, text }) {
-      console.log('editor change!', quill, html, text)
       this.content = html
+    },
+    async writeReply() {
+      if (this.loading) return
+      try {
+        this.loading = true
+        let res = await API.writeReply(this.$route.params.id, this.content)
+        let id = res.data.data.id
+        this.replyData.push({
+          id,
+          avatar: this.userInfo.avatar,
+          nickname: this.userInfo.nickname,
+          content: this.content,
+          createtime: Date.now()
+        })
+        this.content = ''
+        this.loading = false
+      } catch (err) {
+        console.log(err)
+        this.loading = false
+      }
+    },
+    async getReply() {
+      try {
+        let res = await API.getReply(this.$route.params.id)
+        this.replyData = res.data.data
+      } catch (err) {
+        console.log(err)
+      }
     }
   }
 }
