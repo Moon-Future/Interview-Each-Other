@@ -1,30 +1,26 @@
-function formatNumber(n) {
-  n = n.toString()
-  return n[1] ? n : '0' + n
-}
-
 function checkType(val) {
   return Object.prototype.toString.call(val).slice(8, -1)
 }
 
 // 格式化时间戳
-export function formatTime(date, num1 = 3, num2 = 3) {
-  const year = date.getFullYear()
-  const month = date.getMonth() + 1
-  const day = date.getDate()
-  const hour = date.getHours()
-  const minute = date.getMinutes()
-  const second = date.getSeconds()
-  let arr1 = [year, month, day]
-  let arr2 = [hour, minute, second]
-  arr1 = arr1.filter((ele, index) => {
-    return index < num1
-  })
-  arr2 = arr2.filter((ele, index) => {
-    return index < num2
-  })
-
-  return arr1.map(formatNumber).join('-') + ' ' + arr2.map(formatNumber).join(':')
+export function formatTime(date, format) {
+  date = typeof date === 'number' ? new Date(date) : date
+  let o = {
+    'M+': date.getMonth() + 1,
+    'd+': date.getDate(),
+    'h+': date.getHours(),
+    'm+': date.getMinutes(),
+    's+': date.getSeconds()
+  }
+  if (/(y+)/i.test(format)) {
+    format = format.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length))
+  }
+  for (let k in o) {
+    if (new RegExp('(' + k + ')').test(format)) {
+      format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ('00' + o[k]).substr(('' + o[k]).length))
+    }
+  }
+  return format
 }
 
 // 节流函数
@@ -57,4 +53,23 @@ export function deepClone(obj) {
     }
   }
   return ret
+}
+
+export function beforeTime(timestamp) {
+  let diff = Date.now() - timestamp
+  let seconds = diff / 1000
+  let minutes = Math.floor(seconds / 60)
+  let hours = Math.floor(minutes / 60)
+  let days = Math.floor(hours / 24)
+  if (minutes <= 0) {
+    return '刚刚'
+  } else if (hours <= 0) {
+    return `${minutes} 分钟前`
+  } else if (days < 1) {
+    return `${hours} 小时 ${minutes % 60} 分钟前`
+  } else if (new Date(timestamp).getFullYear() === new Date().getFullYear()) {
+    return formatTime(new Date(timestamp), 'MM-dd hh:mm')
+  } else {
+    return formatTime(new Date(timestamp), 'yyyy-MM-dd hh:mm')
+  }
 }

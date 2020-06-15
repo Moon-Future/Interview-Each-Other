@@ -17,11 +17,21 @@ export default {
     if (token) {
       this.setUserInfo({ userInfo: JSON.parse(userInfo), status: true, token })
     }
+    console.log('socket', this.$socket)
+    this.$socket.emit('chat', '66666')
   },
   methods: {
     ...mapMutations({
       setUserInfo: 'SET_USERINFO'
     })
+  },
+  sockets: {
+    connect() {
+      console.log('app connect', arguments)
+    },
+    chatserver() {
+      console.log('chat', arguments)
+    }
   }
 }
 </script>

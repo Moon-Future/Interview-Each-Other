@@ -3,28 +3,16 @@
     <div class="content">
       <div class="member">
         <p class="role">面试者</p>
-        <el-avatar
-          :size="200"
-          src="http://pic1.zhimg.com/50/v2-ab30cf77a79a5d8ff051a418493c5652_hd.jpg"
-        ></el-avatar>
+        <el-avatar :size="200" src="http://pic1.zhimg.com/50/v2-ab30cf77a79a5d8ff051a418493c5652_hd.jpg"></el-avatar>
         <div class="member-info">
           <p>刺客五六七</p>
         </div>
         <div class="device-icon">
           <div class="audio-icon">
-            <Iconfont
-              :icon="'icon-audio'"
-              :color="audioActive ? playColor : stopColor"
-              :fontSize="36"
-              @click.native="muteAudio"
-            ></Iconfont>
+            <Iconfont :icon="'icon-audio'" :color="audioActive ? playColor : stopColor" :fontSize="36" @click.native="muteAudio"></Iconfont>
             <span v-show="!audioActive">已静音</span>
           </div>
-          <Iconfont
-            :icon="'icon-hangup'"
-            :color="color"
-            :fontSize="36"
-          ></Iconfont>
+          <Iconfont :icon="'icon-hangup'" :color="color" :fontSize="36"></Iconfont>
         </div>
         <div id="self-video"></div>
       </div>
@@ -38,10 +26,7 @@
       </div>
       <div class="member">
         <p class="role">面试官</p>
-        <el-avatar
-          :size="200"
-          src="http://pic1.zhimg.com/50/v2-ab30cf77a79a5d8ff051a418493c5652_hd.jpg"
-        ></el-avatar>
+        <el-avatar :size="200" src="http://pic1.zhimg.com/50/v2-ab30cf77a79a5d8ff051a418493c5652_hd.jpg"></el-avatar>
         <div class="member-info">
           <p>刺客五六七</p>
         </div>
@@ -56,6 +41,7 @@ import Iconfont from '@/components/Iconfont.vue'
 import { formatTime } from '../utils/util'
 // import TRTC from 'trtc-js-sdk'
 // import RtcClient from '../utils/rtc-client'
+import API from '@/utils/api'
 
 export default {
   name: 'Room',
@@ -70,7 +56,7 @@ export default {
       stopColor: '#909399',
       playColor: '#409EFF',
       audioActive: true,
-      startTime: formatTime(new Date(), 3, 2),
+      startTime: formatTime(new Date(), 'hh:mm'),
       talkTime: '00 : 00',
       talkSeconds: 0
     }
@@ -88,7 +74,14 @@ export default {
     //     })
     //   })
     //   .catch(error => console.error('getDevices error observed ' + error))
-    this.talkSecondsInterval()
+    // this.talkSecondsInterval()
+    console.log('进入')
+    API.entryInfo('进入')
+  },
+
+  async beforeDestroy() {
+    console.log('关闭')
+    await API.entryInfo('关闭')
   },
 
   methods: {
@@ -102,9 +95,7 @@ export default {
     talkTimeFormat() {
       let mins = Math.floor(this.talkSeconds / 60).toString()
       let secs = (this.talkSeconds % 60).toString()
-      this.talkTime = `${mins[1] ? mins : '0' + mins} : ${
-        secs[1] ? secs : '0' + secs
-      }`
+      this.talkTime = `${mins[1] ? mins : '0' + mins} : ${secs[1] ? secs : '0' + secs}`
     },
 
     createRoom() {
@@ -149,9 +140,7 @@ export default {
         const userId = remoteStream.getUserId()
         this.members_[userId] = remoteStream
         this.client_.subscribe(remoteStream)
-        console.log(
-          `remote stream added: [${userId}] ID: ${id} type: ${remoteStream.getType()}`
-        )
+        console.log(`remote stream added: [${userId}] ID: ${id} type: ${remoteStream.getType()}`)
       })
       // fired when a remote stream has been subscribed
       this.client_.on('stream-subscribed', evt => {
@@ -228,9 +217,7 @@ export default {
     },
 
     showStreamState(stream) {
-      console.log(
-        'has audio: ' + stream.hasAudio() + ' has video: ' + stream.hasVideo()
-      )
+      console.log('has audio: ' + stream.hasAudio() + ' has video: ' + stream.hasVideo())
     },
 
     getUidByStreamId(streamId) {

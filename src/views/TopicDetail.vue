@@ -12,7 +12,7 @@
             </div>
             <img class="avatar" :src="topicData.avatar" alt="" />
           </div>
-          <div class="topic-content" v-html="topicData.content"></div>
+          <div class="topic-content" v-show="topicData.content" v-html="topicData.content"></div>
         </div>
         <topic-reply></topic-reply>
       </div>

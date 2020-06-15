@@ -1,17 +1,21 @@
 import http from './http'
 
 export const URL = {
+  // 用户
   register: '/api/user/register', // 用户注册
   login: '/api/user/login', // 用户登陆
   getJob: '/api/user/getJob', // 获取职位列表
   updateUserInfo: '/api/user/updateUserInfo', // 更新用户信息
   upload: '/api/user/upload', // 图片上传
-
+  // 主题
   wirte: '/api/topic/write', // 发表主题
   getTopic: '/api/topic/getTopic', // 获取主题列表
   getTopicContent: '/api/topic/getContent', // 获取主题内容
   writeReply: '/api/topic/writeReply', // 评论
-  getReply: '/api/topic/getReply' // 获取评论列表
+  getReply: '/api/topic/getReply', // 获取评论列表
+
+  // 房间
+  entryInfo: '/api/room/message' // 进入，离开页面信息测试
 }
 
 const API = {
@@ -78,6 +82,10 @@ const API = {
    */
   getReply(topicId) {
     return http.get(URL.getReply, { params: { topic: topicId } })
+  },
+
+  entryInfo(message) {
+    return http.post(URL.entryInfo, { message })
   }
 }
 

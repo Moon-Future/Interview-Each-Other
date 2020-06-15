@@ -56,7 +56,7 @@ router.post('/write', async ctx => {
 router.get('/getTopic', async ctx => {
   try {
     let result = await query(
-      `SELECT t.id, t.title, t.user as user, t.createtime, u.nickname, u.avatar, u.sex, j.id as job, j.name as jobm FROM topic as t, user as u, job as j WHERE t.off != 1 AND t.user = u.id AND u.job = j.id`
+      `SELECT t.id, t.title, t.user as user, t.createtime, u.nickname, u.avatar, u.sex, j.id as job, j.name as jobm FROM topic as t, user as u, job as j WHERE t.off != 1 AND t.user = u.id AND u.job = j.id ORDER BY createtime DESC`
     )
     ctx.body = { topicList: result }
   } catch (err) {
@@ -83,7 +83,19 @@ router.post('/writeReply', async ctx => {
   }
   try {
     let { content, topic } = ctx.request.body
+    if (content.trim() === '') {
+      ctx.status = 400
+      ctx.body = { message: '请输入内容' }
+      return
+    }
+    const forbiddenWords = await query(`SELECT * FROM forbidden WHERE off != 1`)
     let id = shortid.generate()
+    if (forbiddenWords.length !== 0) {
+      forbiddenWords.forEach(ele => {
+        let reg = new RegExp(ele.word, 'g')
+        content = content.replace(reg, strAdd('*', ele.word.length))
+      })
+    }
     await query(`INSERT INTO reply (id, content, topic, user, createtime) VALUES (?, ?, ?, ?, ?)`, [
       id,
       content.trim(),
@@ -91,7 +103,7 @@ router.post('/writeReply', async ctx => {
       userInfo.id,
       Date.now()
     ])
-    ctx.body = { data: { id: id } }
+    ctx.body = { data: { id: id, content } }
   } catch (err) {
     throw new Error(err)
   }
@@ -101,7 +113,10 @@ router.post('/writeReply', async ctx => {
 router.get('/getReply', async ctx => {
   try {
     let { topic } = ctx.request.query
-    let result = await query(`SELECT r.*, u.avatar, u.nickname FROM reply r, user u WHERE r.topic = ? AND r.off != 1 AND r.user = u.id`, [topic])
+    let result = await query(
+      `SELECT r.*, u.avatar, u.nickname FROM reply r, user u WHERE r.topic = ? AND r.off != 1 AND r.user = u.id  ORDER BY createtime`,
+      [topic]
+    )
     ctx.body = { data: result }
   } catch (err) {
     throw new Error(err)

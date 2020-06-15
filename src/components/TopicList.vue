@@ -25,7 +25,7 @@
 <script>
 import Iconfont from '@/components/Iconfont.vue'
 import NavBar from '@/components/NavBar.vue'
-import { formatTime } from '@/utils/util'
+import { formatTime, beforeTime } from '@/utils/util'
 import API from '@/utils/api'
 
 export default {
@@ -48,27 +48,11 @@ export default {
         let result = await API.getTopic()
         this.topicList = result.data.topicList
         this.topicList.forEach(ele => {
-          ele.beforeTime = this.beforeTime(ele.createtime)
-          ele.createtime = formatTime(new Date(ele.createtime), 3, 2)
+          ele.beforeTime = beforeTime(ele.createtime)
+          ele.createtime = formatTime(new Date(ele.createtime), 'yyyy-MM-dd hh:mm')
         })
       } catch (err) {
         console.log(err)
-      }
-    },
-    beforeTime(timestamp) {
-      let diff = Date.now() - timestamp
-      let seconds = diff / 1000
-      let minutes = Math.floor(seconds / 60)
-      let hours = Math.floor(minutes / 60)
-      let days = Math.floor(hours / 24)
-      if (minutes <= 0) {
-        return '刚刚'
-      } else if (hours <= 0) {
-        return `${minutes} 分钟前`
-      } else if (days < 1) {
-        return `${hours} 小时 ${minutes % 60} 分钟前`
-      } else {
-        return formatTime(new Date(timestamp), 3, 2)
       }
     }
   }

@@ -177,6 +177,7 @@ export default {
             const { token, userInfo } = res.data
             this.setUserInfo({ userInfo, status: true, token })
             this.setLoginVisiable(false)
+            this.submitting = false
           } catch {
             this.submitting = false
           }

@@ -1,12 +1,14 @@
 <template>
   <div class="topic-reply">
-    <div class="reply-text">
+    <div class="reply-text" v-show="replyData.length !== 0">
       <div class="reply-item" v-for="(item, index) in replyData" :key="index">
         <div class="user-info">
           <img class="avatar" :src="item.avatar || defaultAvatar" />
           <div class="reply-title">
-            <span class="username">1 XanderChen</span>
-            <span class="replytime">4 分钟前</span>
+            <span class="username">{{ item.nickname }}</span>
+            <el-tooltip effect="light" :content="item.createtime" placement="top-start">
+              <span class="replytime">{{ item.beforeTime }}</span>
+            </el-tooltip>
           </div>
         </div>
         <div class="reply-content" v-html="item.content"></div>
@@ -38,7 +40,8 @@ import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
 import { quillEditor } from 'vue-quill-editor'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
+import { formatTime, beforeTime } from '@/utils/util'
 import API from '@/utils/api'
 
 export default {
@@ -72,9 +75,10 @@ export default {
     editor() {
       return this.$refs.myQuillEditor.quill
     },
-    ...mapGetters(['userInfo'])
+    ...mapGetters(['userInfo', 'loginStatus'])
   },
   activated() {
+    this.replyData = []
     this.$set(this.editorOption, 'placeholder', `${this.userInfo.nickname || '大佬'}，你怎么看......`)
     this.getReply()
   },
@@ -86,17 +90,35 @@ export default {
       this.content = html
     },
     async writeReply() {
-      if (this.loading) return
+      if (!this.loginStatus) {
+        this.setLoginVisiable(true)
+        this.setLoginFlag(true)
+        return
+      }
+      if (this.loading || this.content === '') return
       try {
         this.loading = true
-        let res = await API.writeReply(this.$route.params.id, this.content)
+        let content = this.content
+        let hrefList = content.match(/<a(.*?)<\/a>/g) || []
+        hrefList.forEach(hrefStr => {
+          let href = hrefStr.match(/href="(.*?)"/)
+          if (href && href[1].substr(0, 4) !== 'http' && href[1].substr(0, 2) !== '//') {
+            let newHrefStr = hrefStr.replace(`href="${href[1]}"`, `href="//${href[1]}"`)
+            let regexp = new RegExp(hrefStr, 'g')
+            content = content.replace(regexp, newHrefStr)
+          }
+        })
+        let res = await API.writeReply(this.$route.params.id, content)
         let id = res.data.data.id
+        let replyContent = res.data.data.content
+        let now = Date.now()
         this.replyData.push({
           id,
           avatar: this.userInfo.avatar,
           nickname: this.userInfo.nickname,
-          content: this.content,
-          createtime: Date.now()
+          content: replyContent,
+          beforeTime: beforeTime(now),
+          createtime: formatTime(new Date(now), 'yyyy-MM-dd hh:mm')
         })
         this.content = ''
         this.loading = false
@@ -109,10 +131,18 @@ export default {
       try {
         let res = await API.getReply(this.$route.params.id)
         this.replyData = res.data.data
+        this.replyData.forEach(ele => {
+          ele.beforeTime = beforeTime(ele.createtime)
+          ele.createtime = formatTime(new Date(ele.createtime), 'yyyy-MM-dd hh:mm')
+        })
       } catch (err) {
         console.log(err)
       }
-    }
+    },
+    ...mapMutations({
+      setLoginVisiable: 'SET_LOGINVISIABLE',
+      setLoginFlag: 'SET_LOGINFLAG'
+    })
   }
 }
 </script>

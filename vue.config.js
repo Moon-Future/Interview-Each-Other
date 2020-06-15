@@ -7,6 +7,13 @@ module.exports = {
         pathRewrite: {
           '^/api': ''
         }
+      },
+      '/socket': {
+        target: 'http://localhost:1756',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/socket': ''
+        }
       }
     }
   },
