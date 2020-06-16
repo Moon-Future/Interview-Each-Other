@@ -75,13 +75,12 @@ export default {
     //   })
     //   .catch(error => console.error('getDevices error observed ' + error))
     // this.talkSecondsInterval()
-    console.log('进入')
-    API.entryInfo('进入')
+    this.$socket.emit('chat', '进入')
   },
 
-  async beforeDestroy() {
-    console.log('关闭')
-    await API.entryInfo('关闭')
+  beforeRouteLeave(to, form, next) {
+    this.$socket.emit('chat', '离开')
+    next()
   },
 
   methods: {

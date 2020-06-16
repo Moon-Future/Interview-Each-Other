@@ -8,12 +8,15 @@ module.exports = {
           '^/api': ''
         }
       },
-      '/socket': {
+      '/socket.io': {
         target: 'http://localhost:1756',
-        changeOrigin: true,
-        pathRewrite: {
-          '^/socket': ''
-        }
+        ws: true,
+        changeOrigin: true
+      },
+      '/sockjs-node': {
+        target: 'http://localhost:1756',
+        ws: false,
+        changeOrigin: true
       }
     }
   },

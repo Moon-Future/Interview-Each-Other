@@ -9,6 +9,7 @@
             <span @click="register">注册</span>
           </li>
           <li v-else class="user-wrapper">
+            <router-link to="/room">房间</router-link>
             <el-dropdown trigger="click">
               <div class="avatar">
                 <span>{{ userInfo.nickname }}</span>

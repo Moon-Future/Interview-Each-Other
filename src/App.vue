@@ -17,8 +17,6 @@ export default {
     if (token) {
       this.setUserInfo({ userInfo: JSON.parse(userInfo), status: true, token })
     }
-    console.log('socket', this.$socket)
-    this.$socket.emit('chat', '66666')
   },
   methods: {
     ...mapMutations({
@@ -28,6 +26,9 @@ export default {
   sockets: {
     connect() {
       console.log('app connect', arguments)
+    },
+    disconnect() {
+      console.log('socket 断开连接了！') // 监听socket断开
     },
     chatserver() {
       console.log('chat', arguments)

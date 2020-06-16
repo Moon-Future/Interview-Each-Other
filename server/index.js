@@ -28,10 +28,11 @@ app.use(router.routes()).use(router.allowedMethods())
 
 // socket连接
 io.on('connection', socket => {
+  console.log('建立连接')
   socket.on('chat', msg => {
     console.log('message: ' + msg)
     // io.emit('chat', msg)
-    io.emit('chatserver', msg + 'xxx')
+    socket.emit('chatserver', msg + 'xxx')
   })
   socket.on('disconnect', () => {
     console.log('user disconnected')
