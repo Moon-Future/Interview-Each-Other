@@ -14,7 +14,11 @@ const options = { path: 'socket.io' }
 Vue.use(
   new VueSocketIO({
     debug: true,
-    connection: 'ws://localhost:1756'
+    connection: 'ws://localhost:1756',
+    vuex: {
+      store,
+      mutationPrefix: 'SOCKET_'
+    }
   })
 )
 

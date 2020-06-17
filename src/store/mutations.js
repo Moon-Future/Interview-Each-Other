@@ -21,6 +21,9 @@ const mutations = {
   },
   [types.SET_LOGINFLAG](state, flag) {
     state.loginFlag = flag
+  },
+  ['SOCKET_onlineCounter'](state, counter) {
+    state.onlineCounter = counter
   }
 }
 

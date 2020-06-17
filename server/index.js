@@ -8,6 +8,7 @@ const path = require('path')
 const router = require('./router')
 const server = require('http').createServer(app.callback())
 const io = require('socket.io')(server)
+const socketHandle = require('./api/socket')
 
 const CONFIG = {
   key: 'koa:sess',
@@ -26,18 +27,7 @@ app.use(bodyParser())
 app.use(staticfile(path.join(__dirname, '../dist'))) // 部署上线时读取静态文件
 app.use(router.routes()).use(router.allowedMethods())
 
-// socket连接
-io.on('connection', socket => {
-  console.log('建立连接')
-  socket.on('chat', msg => {
-    console.log('message: ' + msg)
-    // io.emit('chat', msg)
-    socket.emit('chatserver', msg + 'xxx')
-  })
-  socket.on('disconnect', () => {
-    console.log('user disconnected')
-  })
-})
+socketHandle(io)
 
 server.listen(1756, () => {
   console.log('listen at port 1756...')

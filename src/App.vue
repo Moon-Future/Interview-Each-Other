@@ -16,6 +16,7 @@ export default {
     const userInfo = localStorage.getItem('userInfo')
     if (token) {
       this.setUserInfo({ userInfo: JSON.parse(userInfo), status: true, token })
+      this.$socket.emit('login', token)
     }
   },
   methods: {
@@ -29,9 +30,6 @@ export default {
     },
     disconnect() {
       console.log('socket 断开连接了！') // 监听socket断开
-    },
-    chatserver() {
-      console.log('chat', arguments)
     }
   }
 }
