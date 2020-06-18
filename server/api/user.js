@@ -4,7 +4,7 @@ const query = require('../database/init')
 const shortid = require('shortid')
 const jwt = require('jsonwebtoken')
 const formidable = require('formidable')
-const { checkToken, dateFormat } = require('./util')
+const { checkToken, createId } = require('./util')
 const { tokenConfig, githubConfig } = require('../secret/code')
 // const { transporter, mailOptions } = require('./email')
 const cosUpload = require('./tencentCloud')
@@ -44,7 +44,12 @@ router.post('/register', async ctx => {
       ctx.body = { message: '用户长度在 1 到 100 个字符' }
       return
     }
-    let userID = shortid.generate()
+    let userID = createId()
+    let checkId = await query(`SELECT * FROM user WHERE id = ?`, [userID])
+    while (checkId.length !== 0) {
+      userID = createId()
+      checkId = await query(`SELECT * FROM user WHERE id = ?`, [userID])
+    }
     let avatar = 'https://interview-1255423800.cos.ap-guangzhou.myqcloud.com/avatar/default.jpg'
     await query(
       `INSERT INTO user (id, username, password, nickname, avatar, email, createtime) 

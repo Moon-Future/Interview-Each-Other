@@ -9,6 +9,9 @@
       </span>
     </div>
     <el-form :model="formData" :rules="readonly ? {} : rules" ref="userForm" label-position="left" label-width="76px" class="form">
+      <el-form-item label="ID">
+        <span class="form-text">{{ userInfo.id }}</span>
+      </el-form-item>
       <el-form-item label="账号">
         <span class="form-text">{{ userInfo.username }}</span>
       </el-form-item>

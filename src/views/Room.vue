@@ -1,36 +1,60 @@
 <template>
   <div class="room">
     <div class="content">
-      <div class="member">
-        <p class="role">面试者</p>
-        <el-avatar :size="200" src="http://pic1.zhimg.com/50/v2-ab30cf77a79a5d8ff051a418493c5652_hd.jpg"></el-avatar>
-        <div class="member-info">
-          <p>刺客五六七</p>
-        </div>
-        <div class="device-icon">
-          <div class="audio-icon">
-            <Iconfont :icon="'icon-audio'" :color="audioActive ? playColor : stopColor" :fontSize="36" @click.native="muteAudio"></Iconfont>
-            <span v-show="!audioActive">已静音</span>
+      <div class="header">
+        <router-link class="header-logo" to="/">Interview</router-link>
+        <ul class="header-right">
+          <li>Call</li>
+          <li>挂断</li>
+        </ul>
+      </div>
+      <div class="wrapper">
+        <div class="wrapper-left">
+          <div class="user-list beauty-Scroll">
+            <el-scrollbar>
+              <p class="room-counter">当前房间人数：58</p>
+              <div class="user-item" v-for="(item, index) in arr" :key="index">
+                <el-avatar :size="size" :src="userInfo.avatar"></el-avatar>
+                <p class="name">{{ userInfo.nickname }}</p>
+                <div class="call-icon">
+                  <Iconfont icon="icon-call" fontSize="20"></Iconfont>
+                </div>
+              </div>
+            </el-scrollbar>
           </div>
-          <Iconfont :icon="'icon-hangup'" :color="color" :fontSize="36"></Iconfont>
+          <div class="user-audio">
+            <div class="userinfo">
+              <div class="member">
+                <el-avatar :size="100" shape="square" :src="userInfo.avatar"></el-avatar>
+                <p>{{ userInfo.nickname }}</p>
+              </div>
+              <div class="member">
+                <el-avatar :size="100" shape="square" :src="userInfo.avatar"></el-avatar>
+                <p>{{ userInfo.nickname }}</p>
+              </div>
+            </div>
+            <div class="device-wrapper">
+              <div class="device-icon">
+                <div class="audio-icon">
+                  <Iconfont :icon="'icon-audio'" :color="audioActive ? playColor : stopColor" :fontSize="36" @click.native="muteAudio"></Iconfont>
+                  <span v-show="!audioActive">已静音</span>
+                </div>
+                <Iconfont :icon="'icon-hangup'" :color="color" :fontSize="36"></Iconfont>
+              </div>
+            </div>
+          </div>
         </div>
-        <div id="self-video"></div>
-      </div>
-      <div class="center">
-        <p class="time">通话开始：{{ startTime }}</p>
-        <p class="time">通话时长：{{ talkTime }}</p>
-        <div class="line"></div>
-        <div class="resume">
-          <h3 class="title">简历</h3>
+        <div class="wrapper-right">
+          <div class="chat-content">
+            <Chat></Chat>
+          </div>
+          <div class="textarea-wrapper">
+            <quill-editor ref="myQuillEditor" v-model="chatData.content" :options="editorOption" />
+            <div class="btn-send">
+              <el-button size="mini">发送</el-button>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="member">
-        <p class="role">面试官</p>
-        <el-avatar :size="200" src="http://pic1.zhimg.com/50/v2-ab30cf77a79a5d8ff051a418493c5652_hd.jpg"></el-avatar>
-        <div class="member-info">
-          <p>刺客五六七</p>
-        </div>
-        <div id="opposite-video"></div>
       </div>
     </div>
   </div>
@@ -38,13 +62,24 @@
 
 <script>
 import Iconfont from '@/components/Iconfont.vue'
+import Chat from '@/components/Chat.vue'
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
+import { quillEditor } from 'vue-quill-editor'
 import { formatTime } from '../utils/util'
 // import TRTC from 'trtc-js-sdk'
 // import RtcClient from '../utils/rtc-client'
+import { mapGetters } from 'vuex'
 import API from '@/utils/api'
 
 export default {
   name: 'Room',
+  components: {
+    Iconfont,
+    quillEditor,
+    Chat
+  },
   data() {
     return {
       client_: null,
@@ -53,17 +88,28 @@ export default {
       members_: {},
       oppositeid_: 'opposite-video',
       color: 'red',
-      stopColor: '#909399',
-      playColor: '#409EFF',
+      stopColor: '#bbb3b3',
+      playColor: '#15ddfd',
       audioActive: true,
       startTime: formatTime(new Date(), 'hh:mm'),
       talkTime: '00 : 00',
-      talkSeconds: 0
+      talkSeconds: 0,
+      arr: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+      chatData: {
+        content: ''
+      },
+      editorOption: {
+        readOnly: true,
+        formats: {},
+        modules: {
+          toolbar: []
+        }
+      }
     }
   },
 
-  components: {
-    Iconfont
+  computed: {
+    ...mapGetters(['userInfo'])
   },
 
   created() {
@@ -231,6 +277,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '@/scss/variable.scss';
+
 // https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1589660150097&di=833ceb670fcaa23f38328ee20c877de3&imgtype=0&src=http%3A%2F%2Fi0.hdslb.com%2Fbfs%2Farticle%2Fd22bbcc815668a3244e4237c1731b98d8ee370a3.jpg
 .room {
   background-image: url('http://tva1.sinaimg.com/large/6f8a2832gy1fjb9jqlvsdj21hc0xc153.jpg');
@@ -247,13 +295,12 @@ export default {
 }
 .content {
   position: relative;
-  display: flex;
-  justify-content: space-between;
-  width: 80%;
-  height: 80%;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
   z-index: 1;
-  padding: 20px 50px;
+  color: $color-white;
   overflow: hidden;
   &::after {
     content: '';
@@ -271,23 +318,87 @@ export default {
     filter: blur(5px);
   }
 }
-.member {
+.header {
+  height: 50px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  border-bottom: 1px solid #583d54;
+  padding: 0 50px;
+  box-sizing: border-box;
+  ul.header-right {
+    display: flex;
+    li {
+      margin-left: 20px;
+    }
+  }
+}
+.wrapper {
+  display: flex;
+  width: 100%;
+  position: absolute;
+  top: 50px;
+  bottom: 0px;
+}
+.wrapper-left {
+  width: 50%;
+  border-right: 1px solid #583d54;
+  display: flex;
+  position: relative;
+}
+.room-counter {
+  text-align: left;
+  padding: 10px;
+}
+.user-list {
+  width: 250px;
+  .user-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    span {
+      flex: 0 0 auto;
+    }
+    .call-icon {
+      width: 30px;
+      background: #fff;
+      border-radius: 4px;
+      text-align: center;
+      padding: 2px 0;
+      flex: 0 0 auto;
+    }
+    .name {
+      width: 150px;
+      padding: 0 10px;
+      box-sizing: border-box;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: left;
+    }
+  }
+}
+.user-audio {
+  position: absolute;
+  left: 250px;
+  height: 100%;
+  right: 0;
   display: flex;
   flex-flow: column;
-  color: #fff;
-}
-.role {
-  margin-bottom: 20px;
-  font-size: 30px;
-}
-.member-info {
-  margin-top: 50px;
-  height: 100px;
-}
-.device-icon {
-  display: flex;
   justify-content: space-around;
-  margin: 50px 0;
+  .userinfo {
+    display: flex;
+    justify-content: space-around;
+  }
+  .device-wrapper {
+    display: flex;
+    justify-content: center;
+    .device-icon {
+      width: 60%;
+      display: flex;
+      justify-content: space-around;
+    }
+  }
 }
 .audio-icon {
   display: flex;
@@ -295,32 +406,58 @@ export default {
   position: relative;
   span {
     font-size: 12px;
-    color: #909399;
+    color: #bbb3b3;
     position: absolute;
     bottom: -16px;
   }
 }
-.center {
-  color: #fff;
-  font-size: 26px;
-  text-align: left;
-  padding: 0 30px;
-  flex: 1;
-  .time {
-    padding-bottom: 10px;
+
+.wrapper-right {
+  width: 50%;
+}
+.chat-content {
+  height: 70%;
+}
+.textarea-wrapper {
+  height: 30%;
+  background: $color-white;
+  color: $color-black;
+  display: flex;
+  flex-flow: column;
+}
+/deep/ .quill-editor {
+  height: calc(100% - 32px);
+  .ql-toolbar {
+    display: none;
   }
-  .line {
+}
+.btn-send {
+  height: 30px;
+  text-align: right;
+  padding: 2px;
+}
+
+@media screen and (max-width: 1024px) {
+  .user-list {
+    display: none;
+  }
+  .user-audio {
+    left: 0;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .user-list {
+    display: none;
+  }
+  .user-audio {
+    left: 0;
+  }
+  .wrapper-left {
     width: 100%;
-    margin-bottom: 10px;
-    border: 1px dashed;
+  }
+  .wrapper-right {
+    display: none;
   }
 }
-.resume {
-  font-size: 16px;
-}
-// #self-video, #opposite-video {
-//   width: 300px;
-//   height: 300px;
-//   border: 1px solid blue;
-// }
 </style>

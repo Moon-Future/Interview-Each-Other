@@ -40,4 +40,11 @@ function dateFormat(date, format) {
   return format
 }
 
-module.exports = { checkToken, dateFormat }
+// 随机生成数字 ID
+function createId(len = 6) {
+  return Math.random()
+    .toString()
+    .slice(-len)
+}
+
+module.exports = { checkToken, dateFormat, createId }
