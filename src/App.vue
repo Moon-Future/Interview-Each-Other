@@ -30,6 +30,9 @@ export default {
     },
     disconnect() {
       console.log('socket 断开连接了！') // 监听socket断开
+    },
+    msg(message) {
+      console.log('message', message)
     }
   }
 }

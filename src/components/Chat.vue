@@ -1,17 +1,22 @@
 <template>
   <div class="chat-container">
-    <div class="chat-item" :class="{ self: item.self }" v-for="(item, index) in chatContent" :key="index">
-      <template v-if="!item.self">
-        <el-avatar shape="square" :src="userInfo.avatar"></el-avatar>
+    <div class="chat-item" :class="{ self: item.self, system: item.system }" v-for="(item, index) in chatContent" :key="index">
+      <template v-if="item.system">
+        <p class="system-msg">{{ item.text }}</p>
       </template>
-      <div class="chat-item-content">
-        <span class="username">{{ userInfo.nickname }}</span>
-        <div class="content-wrapper">
-          <p>{{ item.text }}</p>
+      <template v-else>
+        <template v-if="!item.self">
+          <el-avatar shape="square" :src="userInfo.avatar"></el-avatar>
+        </template>
+        <div class="chat-item-content">
+          <span class="username">{{ userInfo.nickname }}</span>
+          <div class="content-wrapper">
+            <p>{{ item.text }}</p>
+          </div>
         </div>
-      </div>
-      <template v-if="item.self">
-        <el-avatar shape="square" :src="userInfo.avatar"></el-avatar>
+        <template v-if="item.self">
+          <el-avatar shape="square" :src="userInfo.avatar"></el-avatar>
+        </template>
       </template>
     </div>
   </div>
@@ -28,6 +33,10 @@ export default {
       default() {
         return [
           { self: true, text: '你在干吗？' },
+          {
+            system: true,
+            text: `"风一样的男人" 进入房间`
+          },
           { self: true, text: '你在干吗？' },
           { self: false, text: '我在吃饭啊，你呢？' },
           {
@@ -36,9 +45,25 @@ export default {
               '腾讯云实时音视频,基于CDN2.0互动直播解决方案,单房可容纳10万人同时观看,支持跨终端/全平台互通,全球接入点专线互联,9.9元立即开启20000分钟标清视频通话体验'
           },
           {
+            system: true,
+            text: `"风一样的男人" 拍了拍 "自己的猪头"`
+          },
+          {
             self: true,
             text:
               '腾讯云实时音视频,基于CDN2.0互动直播解决方案,单房可容纳10万人同时观看,支持跨终端/全平台互通,全球接入点专线互联,9.9元立即开启20000分钟标清视频通话体验'
+          },
+          {
+            system: true,
+            text: `"风一样的男人" 进入房间`
+          },
+          {
+            system: true,
+            text: `"风一样的男人" 进入房间`
+          },
+          {
+            system: true,
+            text: `"风一样的男人" 进入房间`
           }
         ]
       }
@@ -96,6 +121,17 @@ export default {
     }
     .content-wrapper {
       background: $color-green;
+    }
+  }
+  &.system {
+    padding: 2px 0;
+    .system-msg {
+      text-align: center;
+      width: 80%;
+      margin: auto;
+      font-size: 12px;
+      line-height: 16px;
+      color: $color-gray;
     }
   }
 }

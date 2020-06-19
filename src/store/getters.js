@@ -6,5 +6,6 @@ export const loginVisiable = state => state.loginVisiable
 
 export const loginFlag = state => state.loginFlag
 
-
 export const onlineCounter = state => state.onlineCounter
+
+export const token = state => state.token

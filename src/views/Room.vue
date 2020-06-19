@@ -112,7 +112,7 @@ export default {
     ...mapGetters(['userInfo'])
   },
 
-  created() {
+  activated() {
     // TRTC.getDevices()
     //   .then(devices => {
     //     devices.forEach(item => {
@@ -121,7 +121,7 @@ export default {
     //   })
     //   .catch(error => console.error('getDevices error observed ' + error))
     // this.talkSecondsInterval()
-    this.$socket.emit('chat', '进入')
+    this.$socket.emit('joinRoom', this.$route.params.id)
   },
 
   beforeRouteLeave(to, form, next) {
@@ -271,6 +271,12 @@ export default {
       //     return uid
       //   }
       // }
+    }
+  },
+
+  sockets: {
+    msg(message) {
+      console.log('message', message)
     }
   }
 }

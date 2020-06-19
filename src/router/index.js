@@ -60,7 +60,7 @@ const routes = [
     component: () => import('../views/Write.vue')
   },
   {
-    path: '/room',
+    path: '/room/:id',
     name: 'Room',
     component: () => import('../views/Room.vue')
   }

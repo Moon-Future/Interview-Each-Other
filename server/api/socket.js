@@ -18,22 +18,36 @@ function socketHandle(io) {
     socket.on('login', token => {
       try {
         const userInfo = jwt.verify(token.split(' ')[1], tokenConfig.privateKey)
-        userMap[socket.id] = userInfo
-        userCounter++
-        console.log('userCounter', userCounter)
-        io.emit('onlineCounter', userCounter)
+        if (!userMap[userInfo.id]) {
+          userMap[userInfo.id] = userInfo
+          userCounter++
+          console.log('userCounter', userCounter)
+          io.emit('onlineCounter', userCounter)
+        }
       } catch (err) {
         return false
       }
     })
 
     // 退出登陆
-    socket.on('logout', () => {
-      if (userMap[socket.id]) {
-        delete userMap[socket.id]
-        userCounter--
-        io.emit('onlineCounter', userCounter)
+    socket.on('logout', token => {
+      try {
+        const userInfo = jwt.verify(token.split(' ')[1], tokenConfig.privateKey)
+        if (userMap[userInfo.id]) {
+          delete userMap[userInfo.id]
+          userCounter--
+          io.emit('onlineCounter', userCounter)
+        }
+      } catch (err) {
+        return false
       }
+    })
+
+    // 进入房间
+    socket.on('joinRoom', id => {
+      console.log('joinRoom', id)
+      socket.join(id)
+      io.to(id).emit('msg', 'Hello')
     })
 
     socket.on('disconnect', () => {

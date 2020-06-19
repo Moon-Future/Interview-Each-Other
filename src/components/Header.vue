@@ -13,7 +13,7 @@
               <div>在线人数：{{ onlineCounter }}</div>
             </li>
             <li>
-              <router-link to="/room">房间</router-link>
+              <router-link :to="`/room/${userInfo.id}`">房间</router-link>
             </li>
             <li class="user-wrapper">
               <el-dropdown trigger="click">
@@ -94,7 +94,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['loginStatus', 'userInfo', 'onlineCounter'])
+    ...mapGetters(['loginStatus', 'userInfo', 'onlineCounter', 'token'])
   },
   methods: {
     login() {
@@ -106,8 +106,8 @@ export default {
       this.setLoginFlag(false)
     },
     logout() {
+      this.$socket.emit('logout', this.token)
       this.setUserInfo({ userInfo: {}, status: false })
-      this.$socket.emit('logout')
       if (this.$route.path !== '/') {
         this.$router.push({ path: '/' })
       }
