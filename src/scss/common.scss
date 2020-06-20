@@ -25,6 +25,6 @@
     // width: calc(100% + 17px); /*将垂直滚动条挤到可视区域之外*/
     // height: calc(100% + 17px); /*将水平滚动条挤到可视区域之外*/
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: scroll;
   }
 }

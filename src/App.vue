@@ -26,13 +26,10 @@ export default {
   },
   sockets: {
     connect() {
-      console.log('app connect', arguments)
+      console.log('socket connect')
     },
     disconnect() {
-      console.log('socket 断开连接了！') // 监听socket断开
-    },
-    msg(message) {
-      console.log('message', message)
+      console.log('socket disconnected') // 监听socket断开
     }
   }
 }

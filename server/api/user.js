@@ -89,7 +89,7 @@ router.post('/login', async ctx => {
     }
     const userInfo = result[0]
     delete userInfo.password
-    const token = jwt.sign({ id: result[0].id }, tokenConfig.privateKey, {
+    const token = jwt.sign({ id: result[0].id, nickname: result[0].nickname, avatar: result[0].avatar }, tokenConfig.privateKey, {
       expiresIn: '7d'
     })
     ctx.body = { token: 'Bearer ' + token, userInfo }

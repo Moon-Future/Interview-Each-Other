@@ -12,10 +12,10 @@
         <div class="wrapper-left">
           <div class="user-list beauty-Scroll">
             <el-scrollbar>
-              <p class="room-counter">当前房间人数：58</p>
-              <div class="user-item" v-for="(item, index) in arr" :key="index">
-                <el-avatar :size="size" :src="userInfo.avatar"></el-avatar>
-                <p class="name">{{ userInfo.nickname }}</p>
+              <p class="room-counter">当前房间人数：{{ userList.length }}</p>
+              <div class="user-item" v-for="(item, index) in userList" :key="index">
+                <el-avatar :size="size" :src="item.avatar"></el-avatar>
+                <p class="name">{{ item.nickname }}</p>
                 <div class="call-icon">
                   <Iconfont icon="icon-call" fontSize="20"></Iconfont>
                 </div>
@@ -45,15 +45,7 @@
           </div>
         </div>
         <div class="wrapper-right">
-          <div class="chat-content">
-            <Chat></Chat>
-          </div>
-          <div class="textarea-wrapper">
-            <quill-editor ref="myQuillEditor" v-model="chatData.content" :options="editorOption" />
-            <div class="btn-send">
-              <el-button size="mini">发送</el-button>
-            </div>
-          </div>
+          <Chat ref="chat" :chatContent="chatContent" :roomId="$route.params.id"></Chat>
         </div>
       </div>
     </div>
@@ -77,7 +69,7 @@ export default {
   name: 'Room',
   components: {
     Iconfont,
-    quillEditor,
+    // quillEditor,
     Chat
   },
   data() {
@@ -94,17 +86,8 @@ export default {
       startTime: formatTime(new Date(), 'hh:mm'),
       talkTime: '00 : 00',
       talkSeconds: 0,
-      arr: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
-      chatData: {
-        content: ''
-      },
-      editorOption: {
-        readOnly: true,
-        formats: {},
-        modules: {
-          toolbar: []
-        }
-      }
+      userList: [],
+      chatContent: []
     }
   },
 
@@ -121,11 +104,12 @@ export default {
     //   })
     //   .catch(error => console.error('getDevices error observed ' + error))
     // this.talkSecondsInterval()
+    this.chatContent = []
     this.$socket.emit('joinRoom', this.$route.params.id)
   },
 
   beforeRouteLeave(to, form, next) {
-    this.$socket.emit('chat', '离开')
+    this.$socket.emit('leaveRoom', this.$route.params.id)
     next()
   },
 
@@ -275,8 +259,17 @@ export default {
   },
 
   sockets: {
-    msg(message) {
-      console.log('message', message)
+    chatMessage(message) {
+      this.chatContent.push(message)
+      this.$nextTick(() => {
+        this.$refs.chat.scrollBottom()
+      })
+    },
+    joinRoom(data) {
+      this.userList = data.userList
+    },
+    leaveRoom(data) {
+      this.userList = data.userList
     }
   }
 }
@@ -420,27 +413,6 @@ export default {
 
 .wrapper-right {
   width: 50%;
-}
-.chat-content {
-  height: 70%;
-}
-.textarea-wrapper {
-  height: 30%;
-  background: $color-white;
-  color: $color-black;
-  display: flex;
-  flex-flow: column;
-}
-/deep/ .quill-editor {
-  height: calc(100% - 32px);
-  .ql-toolbar {
-    display: none;
-  }
-}
-.btn-send {
-  height: 30px;
-  text-align: right;
-  padding: 2px;
 }
 
 @media screen and (max-width: 1024px) {
