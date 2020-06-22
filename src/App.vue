@@ -20,6 +20,14 @@ export default {
     }
   },
   methods: {
+    // 通话请求
+    chatRequest() {
+      this.$notify({
+        title: '提示',
+        message: '这是一条不会自动关闭的消息',
+        duration: 0
+      })
+    },
     ...mapMutations({
       setUserInfo: 'SET_USERINFO'
     })

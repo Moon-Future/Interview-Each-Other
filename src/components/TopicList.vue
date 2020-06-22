@@ -11,10 +11,11 @@
           <div class="topic-bottom">
             <el-tag size="mini" type="info">{{ item.jobm }}</el-tag>
             <span class="topic-user">{{ item.nickname }}</span>
-            <el-tooltip effect="light" :content="item.createtime" placement="top-start">
+            <!-- <el-tooltip effect="light" :content="item.createtime" placement="top-start">
               <span>{{ item.beforeTime }}</span>
-            </el-tooltip>
-            <Iconfont :icon="'icon-call'" :fontSize="20" :color="'#909399'"></Iconfont>
+            </el-tooltip> -->
+            <span>{{ item.beforeTime }}</span>
+            <Iconfont :icon="'icon-call'" :fontSize="20" :color="'#909399'" @click.native="callTo(item.user)"></Iconfont>
           </div>
         </article>
       </li>
@@ -54,6 +55,9 @@ export default {
       } catch (err) {
         console.log(err)
       }
+    },
+    callTo(userId) {
+      this.$socket.emit('callRequest', userId)
     }
   }
 }
