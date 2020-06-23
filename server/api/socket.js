@@ -1,8 +1,9 @@
 const jwt = require('jsonwebtoken')
 const { tokenConfig } = require('../secret/code')
 const { user } = require('../database/config')
-let userMap = {},
-  roomMap = {},
+let userMap = {}, // 连接 websocket 的人员，key: userId
+  roomMap = {}, // 房间对象，key: roomId
+  callMap = {},
   userCounter = 0
 
 // 验证是否登陆
@@ -47,6 +48,7 @@ function socketHandle(io) {
     socket.on('login', token => {
       try {
         const userInfo = jwt.verify(token.split(' ')[1], tokenConfig.privateKey)
+        userInfo.socketId = socket.id
         if (!userMap[userInfo.id]) {
           userMap[userInfo.id] = userInfo
           userCounter++
@@ -102,14 +104,37 @@ function socketHandle(io) {
 
     socket.on('callRequest', userId => {
       if (!checkLogin(socket)) return false
-      console.log('userId', userId)
+      if (!userMap[userId]) {
+        // 不在线
+        socket.emit('callResponse', { type: 'offline' })
+        return
+      }
+      let targetUser = userMap[userId]
+      let targetSocket = io.sockets.sockets[targetUser.socketId]
+      // 向目标用户发起请求
+      targetSocket.emit('callRequest', {
+        type: 'call',
+        sourceUser: {
+          id: socket._userInfo_.id,
+          nickname: socket._userInfo_.nickname,
+          avatar: socket._userInfo_.avatar
+        }
+      })
     })
 
+    // 聊天信息
     socket.on('chatMessage', data => {
       if (!checkLogin(socket)) return false
       socket._room_ = socket._room_ || []
       if (socket._room_.indexOf(data.id) !== -1) {
-        io.to(data.id).emit('chatMessage', { userInfo: socket._userInfo_, text: data.msg })
+        io.to(data.id).emit('chatMessage', {
+          userInfo: {
+            id: socket._userInfo_.id,
+            nickname: socket._userInfo_.nickname,
+            avatar: socket._userInfo_.avatar
+          },
+          text: data.msg
+        })
       }
     })
 

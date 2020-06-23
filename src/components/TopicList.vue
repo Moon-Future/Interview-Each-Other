@@ -15,7 +15,13 @@
               <span>{{ item.beforeTime }}</span>
             </el-tooltip> -->
             <span>{{ item.beforeTime }}</span>
-            <Iconfont :icon="'icon-call'" :fontSize="20" :color="'#909399'" @click.native="callTo(item.user)"></Iconfont>
+            <Iconfont
+              v-if="item.user !== userInfo.id"
+              :icon="'icon-call'"
+              :fontSize="20"
+              :color="'#909399'"
+              @click.native="callTo(item.user)"
+            ></Iconfont>
           </div>
         </article>
       </li>
@@ -28,6 +34,7 @@ import Iconfont from '@/components/Iconfont.vue'
 import NavBar from '@/components/NavBar.vue'
 import { formatTime, beforeTime } from '@/utils/util'
 import API from '@/utils/api'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'TopicList',
@@ -39,6 +46,9 @@ export default {
     return {
       topicList: []
     }
+  },
+  computed: {
+    ...mapGetters(['userInfo'])
   },
   created() {
     this.getTopic()
@@ -57,6 +67,9 @@ export default {
       }
     },
     callTo(userId) {
+      if (this.userInfo.id === userId) {
+        return
+      }
       this.$socket.emit('callRequest', userId)
     }
   }

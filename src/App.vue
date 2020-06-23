@@ -28,6 +28,12 @@ export default {
         duration: 0
       })
     },
+    acceptCall() {
+      console.log('acceptCall')
+    },
+    refuseCall() {
+      console.log('refuseCall')
+    },
     ...mapMutations({
       setUserInfo: 'SET_USERINFO'
     })
@@ -38,6 +44,51 @@ export default {
     },
     disconnect() {
       console.log('socket disconnected') // 监听socket断开
+    },
+    // 通话请求
+    callRequest(data) {
+      console.log('callRequest', data)
+      const { sourceUser } = data
+      const createElement = this.$createElement
+      const self = this
+      this.$notify({
+        duration: 0,
+        message: createElement('div', {}, [
+          createElement('h3', {}, `【${sourceUser.nickname}】邀请您进入房间 ${sourceUser.id} 进行面试通话`),
+          createElement('div', { style: { textAlign: 'right' } }, [
+            createElement(
+              'el-button',
+              {
+                attrs: {
+                  type: 'success',
+                  size: 'mini'
+                },
+                on: {
+                  click: self.acceptCall
+                }
+              },
+              '接受'
+            ),
+            createElement(
+              'el-button',
+              {
+                attrs: {
+                  type: 'danger',
+                  size: 'mini'
+                },
+                on: {
+                  click: self.refuseCall
+                }
+              },
+              '拒绝'
+            )
+          ])
+        ])
+      })
+    },
+    // 通话请求响应
+    callResponse(data) {
+      console.log('callRequest', data)
     }
   }
 }
