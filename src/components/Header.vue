@@ -9,12 +9,6 @@
             <span @click="register">注册</span>
           </li>
           <template v-else>
-            <li>
-              <div>在线人数：{{ onlineCounter }}</div>
-            </li>
-            <li>
-              <router-link :to="`/room/${userInfo.id}`">房间</router-link>
-            </li>
             <li class="user-wrapper">
               <el-dropdown trigger="click">
                 <div class="avatar">
@@ -34,6 +28,95 @@
                   </el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
+            </li>
+            <li>
+              <div>在线人数：{{ onlineCounter }}</div>
+            </li>
+            <li>
+              <router-link :to="`/room/${userInfo.id}`">房间</router-link>
+            </li>
+            <li>
+              <el-popover placement="bottom" trigger="click">
+                <div class="callrecord-container">
+                  <div class="callrecord-wrapper">
+                    <h3 class="descr">【Leo】邀请您进入房间 58585888 进行面试通话</h3>
+                    <div class="callrecord-btn">
+                      <el-button type="success" size="mini">接受</el-button>
+                      <el-button type="danger" size="mini">拒绝</el-button>
+                    </div>
+                  </div>
+                  <div class="callrecord-wrapper">
+                    <h3 class="descr">【Leo】邀请您进入房间 58585888 进行面试通话</h3>
+                    <div class="callrecord-btn">
+                      <el-button type="success" size="mini">接受</el-button>
+                      <el-button type="danger" size="mini">拒绝</el-button>
+                    </div>
+                  </div>
+                  <div class="callrecord-wrapper">
+                    <h3 class="descr">【Leo】邀请您进入房间 58585888 进行面试通话</h3>
+                    <div class="callrecord-btn">
+                      <el-button type="success" size="mini">接受</el-button>
+                      <el-button type="danger" size="mini">拒绝</el-button>
+                    </div>
+                  </div>
+                  <div class="callrecord-wrapper">
+                    <h3 class="descr">【Leo】邀请您进入房间 58585888 进行面试通话</h3>
+                    <div class="callrecord-btn">
+                      <el-button type="success" size="mini">接受</el-button>
+                      <el-button type="danger" size="mini">拒绝</el-button>
+                    </div>
+                  </div>
+                  <div class="callrecord-wrapper">
+                    <h3 class="descr">【Leo】邀请您进入房间 58585888 进行面试通话</h3>
+                    <div class="callrecord-btn">
+                      <el-button type="success" size="mini">接受</el-button>
+                      <el-button type="danger" size="mini">拒绝</el-button>
+                    </div>
+                  </div>
+                  <div class="callrecord-wrapper">
+                    <h3 class="descr">【Leo】邀请您进入房间 58585888 进行面试通话</h3>
+                    <div class="callrecord-btn">
+                      <el-button type="success" size="mini">接受</el-button>
+                      <el-button type="danger" size="mini">拒绝</el-button>
+                    </div>
+                  </div>
+                  <div class="callrecord-wrapper">
+                    <h3 class="descr">【Leo】邀请您进入房间 58585888 进行面试通话</h3>
+                    <div class="callrecord-btn">
+                      <el-button type="success" size="mini">接受</el-button>
+                      <el-button type="danger" size="mini">拒绝</el-button>
+                    </div>
+                  </div>
+                  <div class="callrecord-wrapper">
+                    <h3 class="descr">【Leo】邀请您进入房间 58585888 进行面试通话</h3>
+                    <div class="callrecord-btn">
+                      <el-button type="success" size="mini">接受</el-button>
+                      <el-button type="danger" size="mini">拒绝</el-button>
+                    </div>
+                  </div>
+                  <div class="callrecord-wrapper">
+                    <h3 class="descr">【Leo】邀请您进入房间 58585888 进行面试通话</h3>
+                    <div class="callrecord-btn">
+                      <el-button type="success" size="mini">接受</el-button>
+                      <el-button type="danger" size="mini">拒绝</el-button>
+                    </div>
+                  </div>
+                  <div class="callrecord-wrapper">
+                    <h3 class="descr">【Leo】邀请您进入房间 58585888 进行面试通话</h3>
+                    <div class="callrecord-btn">
+                      <el-button type="success" size="mini">接受</el-button>
+                      <el-button type="danger" size="mini">拒绝</el-button>
+                    </div>
+                  </div>
+                </div>
+                <el-badge :value="2" slot="reference" class="badge-wrapper">
+                  语音记录
+                </el-badge>
+              </el-popover>
+              <!-- <div class="badge-wrapper">
+                <span class="badge-text">语音记录</span>
+                <span class="badge-num">2</span>
+              </div> -->
             </li>
           </template>
         </ul>
@@ -70,6 +153,7 @@ export default {
   },
   data() {
     return {
+      show: false,
       dropdownList: [
         {
           icon: 'icon-setting',
@@ -202,5 +286,30 @@ export default {
 }
 .header-height {
   height: 80px;
+}
+.badge-wrapper {
+  position: relative;
+  padding-right: 10px;
+  cursor: pointer;
+}
+/deep/ .el-badge__content.is-fixed {
+  top: 15px;
+}
+.callrecord-container {
+  max-height: 500px;
+  overflow: auto;
+}
+.callrecord-wrapper {
+  border-bottom: 1px solid;
+  padding: 10px;
+  &:last-child {
+    border: none;
+  }
+  .descr {
+    margin-bottom: 10px;
+  }
+  .callrecord-btn {
+    text-align: right;
+  }
 }
 </style>

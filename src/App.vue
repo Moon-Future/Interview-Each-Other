@@ -11,6 +11,11 @@ import { mapMutations } from 'vuex'
 
 export default {
   name: 'App',
+  data() {
+    return {
+      notifications: {}
+    }
+  },
   created() {
     const token = localStorage.getItem('token')
     const userInfo = localStorage.getItem('userInfo')
@@ -20,18 +25,10 @@ export default {
     }
   },
   methods: {
-    // 通话请求
-    chatRequest() {
-      this.$notify({
-        title: '提示',
-        message: '这是一条不会自动关闭的消息',
-        duration: 0
-      })
-    },
     acceptCall() {
       console.log('acceptCall')
     },
-    refuseCall() {
+    refuseCall(sourceUserId) {
       console.log('refuseCall')
     },
     ...mapMutations({
@@ -47,14 +44,12 @@ export default {
     },
     // 通话请求
     callRequest(data) {
-      console.log('callRequest', data)
       const { sourceUser } = data
       const createElement = this.$createElement
-      const self = this
-      this.$notify({
+      let notify = this.$notify({
         duration: 0,
         message: createElement('div', {}, [
-          createElement('h3', {}, `【${sourceUser.nickname}】邀请您进入房间 ${sourceUser.id} 进行面试通话`),
+          createElement('h3', { style: { paddingBottom: '10px' } }, `【${sourceUser.nickname}】邀请您进入房间 ${sourceUser.id} 进行面试通话`),
           createElement('div', { style: { textAlign: 'right' } }, [
             createElement(
               'el-button',
@@ -64,7 +59,7 @@ export default {
                   size: 'mini'
                 },
                 on: {
-                  click: self.acceptCall
+                  click: this.acceptCall
                 }
               },
               '接受'
@@ -77,18 +72,33 @@ export default {
                   size: 'mini'
                 },
                 on: {
-                  click: self.refuseCall
+                  click: () => {
+                    notify.close()
+                  }
                 }
               },
               '拒绝'
             )
           ])
-        ])
+        ]),
+        onClose: () => {
+          this.refuseCall(sourceUser.id)
+        }
       })
+      this.notifications[sourceUser.id] = notify
+    },
+    // 通话请求挂断
+    breakCall(data) {
+      const { sourceUser } = data
+      this.notifications[sourceUser.id].close()
+      delete this.notifications[sourceUser.id]
     },
     // 通话请求响应
     callResponse(data) {
       console.log('callRequest', data)
+      if (data.type === 'offline') {
+        this.$message('对方不在线 😮')
+      }
     }
   }
 }

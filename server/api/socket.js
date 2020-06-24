@@ -3,7 +3,7 @@ const { tokenConfig } = require('../secret/code')
 const { user } = require('../database/config')
 let userMap = {}, // 连接 websocket 的人员，key: userId
   roomMap = {}, // 房间对象，key: roomId
-  callMap = {},
+  callMap = {}, // 通话请求记录
   userCounter = 0
 
 // 验证是否登陆
@@ -42,8 +42,6 @@ function leaveRoom(io, socket, roomId) {
 function socketHandle(io) {
   // socket连接
   io.on('connection', socket => {
-    console.log('connection')
-
     // 验证是否登陆
     socket.on('login', token => {
       try {
@@ -109,15 +107,40 @@ function socketHandle(io) {
         socket.emit('callResponse', { type: 'offline' })
         return
       }
+      let userInfo = socket._userInfo_
+      let sourceUser = userInfo.id
+      callMap[sourceUser] = callMap[sourceUser] || {}
+      if (callMap[sourceUser][userId]) {
+        // 正在拨打
+        return
+      } else {
+        callMap[sourceUser][userId] = true
+      }
       let targetUser = userMap[userId]
       let targetSocket = io.sockets.sockets[targetUser.socketId]
       // 向目标用户发起请求
       targetSocket.emit('callRequest', {
         type: 'call',
         sourceUser: {
-          id: socket._userInfo_.id,
-          nickname: socket._userInfo_.nickname,
-          avatar: socket._userInfo_.avatar
+          id: userInfo.id,
+          nickname: userInfo.nickname,
+          avatar: userInfo.avatar
+        }
+      })
+    })
+
+    socket.on('breakCall', userId => {
+      if (!checkLogin(socket)) return false
+      let userInfo = socket._userInfo_
+      let sourceUser = userInfo.id
+      callMap[sourceUser] && delete callMap[sourceUser][userId]
+      let targetUser = userMap[userId]
+      let targetSocket = io.sockets.sockets[targetUser.socketId]
+      // 告知目标用户已中断请求
+      targetSocket.emit('breakCall', {
+        type: 'break',
+        sourceUser: {
+          id: userInfo.id
         }
       })
     })
@@ -139,7 +162,6 @@ function socketHandle(io) {
     })
 
     socket.on('disconnect', () => {
-      console.log('disconnected')
       // 删除在线人员
       if (socket._userInfo_ && userMap[socket._userInfo_.id]) {
         delete userMap[socket._userInfo_.id]

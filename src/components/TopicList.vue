@@ -20,7 +20,7 @@
               :icon="'icon-call'"
               :fontSize="20"
               :color="'#909399'"
-              @click.native="callTo(item.user)"
+              @click.native="callTo(item.user, item.nickname)"
             ></Iconfont>
           </div>
         </article>
@@ -44,11 +44,13 @@ export default {
   },
   data() {
     return {
-      topicList: []
+      topicList: [],
+      wait: 60,
+      calls: {}
     }
   },
   computed: {
-    ...mapGetters(['userInfo'])
+    ...mapGetters(['userInfo', 'loginStatus'])
   },
   created() {
     this.getTopic()
@@ -66,11 +68,59 @@ export default {
         console.log(err)
       }
     },
-    callTo(userId) {
-      if (this.userInfo.id === userId) {
+    // 中断呼叫
+    breakCall(userId) {
+      delete this.calls[userId]
+      this.$socket.emit('breakCall', userId)
+    },
+    // 呼叫某人
+    callTo(userId, nickname) {
+      if (!this.loginStatus) {
+        this.$message('请先登陆')
         return
       }
+      if (this.userInfo.id === userId || this.calls[userId]) {
+        return
+      }
+      this.calls[userId] = true
       this.$socket.emit('callRequest', userId)
+      const createElement = this.$createElement
+      let notify = this.$notify({
+        duration: 0,
+        message: createElement('div', {}, [
+          createElement('h3', { style: { paddingBottom: '10px' } }, `正在邀请【${nickname}】进行面试通话`),
+          createElement('div', { style: { textAlign: 'right' } }, [
+            createElement(
+              'el-button',
+              {
+                attrs: {
+                  loading: true,
+                  size: 'mini'
+                }
+              },
+              '等待接听'
+            ),
+            createElement(
+              'el-button',
+              {
+                attrs: {
+                  type: 'danger',
+                  size: 'mini'
+                },
+                on: {
+                  click: () => {
+                    notify.close()
+                  }
+                }
+              },
+              '挂断'
+            )
+          ])
+        ]),
+        onClose: () => {
+          this.breakCall(userId)
+        }
+      })
     }
   }
 }
