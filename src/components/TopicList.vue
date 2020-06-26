@@ -46,7 +46,8 @@ export default {
     return {
       topicList: [],
       wait: 60,
-      calls: {}
+      calls: {},
+      notifications: {}
     }
   },
   computed: {
@@ -70,8 +71,10 @@ export default {
     },
     // 中断呼叫
     breakCall(userId) {
-      delete this.calls[userId]
-      this.$socket.emit('breakCall', userId)
+      if (this.calls[userId]) {
+        delete this.calls[userId]
+        this.$socket.emit('breakCall', userId)
+      }
     },
     // 呼叫某人
     callTo(userId, nickname) {
@@ -120,6 +123,33 @@ export default {
         onClose: () => {
           this.breakCall(userId)
         }
+      })
+      this.notifications[userId] = notify
+    }
+  },
+  sockets: {
+    // 通话请求响应
+    callResponse(data) {
+      if (data.type === 'offline') {
+        this.$message('对方不在线 😮')
+        this.notifications[data.targetUser.id].close()
+        delete this.notifications[data.targetUser.id]
+      }
+    },
+    // 请求被拒绝
+    refuseCall(data) {
+      const { targetUser } = data
+      this.notifications[targetUser.id].close()
+      delete this.notifications[targetUser.id]
+    },
+    // 对方接受请求
+    acceptCall(data) {
+      const { targetUser } = data
+      delete this.calls[targetUser.id]
+      this.notifications[targetUser.id].close()
+      delete this.notifications[targetUser.id]
+      this.$router.push({
+        path: `/room/${this.userInfo.id}`
       })
     }
   }

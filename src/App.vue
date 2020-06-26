@@ -25,11 +25,19 @@ export default {
     }
   },
   methods: {
-    acceptCall() {
-      console.log('acceptCall')
+    acceptCall(sourceUserId) {
+      let notify = this.notifications[sourceUserId]
+      delete this.notifications[sourceUserId]
+      notify.close()
+      this.$socket.emit('acceptCall', sourceUserId)
+      this.$router.push({
+        path: `/room/${sourceUserId}`
+      })
     },
     refuseCall(sourceUserId) {
-      console.log('refuseCall')
+      if (this.notifications[sourceUserId]) {
+        this.$socket.emit('refuseCall', sourceUserId)
+      }
     },
     ...mapMutations({
       setUserInfo: 'SET_USERINFO'
@@ -59,7 +67,9 @@ export default {
                   size: 'mini'
                 },
                 on: {
-                  click: this.acceptCall
+                  click: () => {
+                    this.acceptCall(sourceUser.id)
+                  }
                 }
               },
               '接受'
@@ -92,13 +102,6 @@ export default {
       const { sourceUser } = data
       this.notifications[sourceUser.id].close()
       delete this.notifications[sourceUser.id]
-    },
-    // 通话请求响应
-    callResponse(data) {
-      console.log('callRequest', data)
-      if (data.type === 'offline') {
-        this.$message('对方不在线 😮')
-      }
     }
   }
 }

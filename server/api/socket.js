@@ -3,7 +3,8 @@ const { tokenConfig } = require('../secret/code')
 const { user } = require('../database/config')
 let userMap = {}, // 连接 websocket 的人员，key: userId
   roomMap = {}, // 房间对象，key: roomId
-  callMap = {}, // 通话请求记录
+  calltoMap = {}, // 通话请求记录(主动拨打者 id 为 key)
+  callgetMap = {}, // 通话请求记录(接收者 id 为 key)
   userCounter = 0
 
 // 验证是否登陆
@@ -100,23 +101,26 @@ function socketHandle(io) {
       leaveRoom(io, socket, id)
     })
 
+    // 请求通话
     socket.on('callRequest', userId => {
       if (!checkLogin(socket)) return false
       if (!userMap[userId]) {
         // 不在线
-        socket.emit('callResponse', { type: 'offline' })
+        socket.emit('callResponse', { type: 'offline', targetUser: { id: userId } })
         return
       }
       let userInfo = socket._userInfo_
-      let sourceUser = userInfo.id
-      callMap[sourceUser] = callMap[sourceUser] || {}
-      if (callMap[sourceUser][userId]) {
+      let sourceUser = userInfo.id // 发起通话者
+      calltoMap[sourceUser] = calltoMap[sourceUser] || {}
+      callgetMap[userId] = callgetMap[userId] || {}
+      if (calltoMap[sourceUser][userId]) {
         // 正在拨打
         return
       } else {
-        callMap[sourceUser][userId] = true
+        calltoMap[sourceUser][userId] = true
+        callgetMap[userId][sourceUser] = sourceUser
       }
-      let targetUser = userMap[userId]
+      let targetUser = userMap[userId] // 接受通话者
       let targetSocket = io.sockets.sockets[targetUser.socketId]
       // 向目标用户发起请求
       targetSocket.emit('callRequest', {
@@ -129,20 +133,61 @@ function socketHandle(io) {
       })
     })
 
+    // 中断通话
     socket.on('breakCall', userId => {
       if (!checkLogin(socket)) return false
       let userInfo = socket._userInfo_
       let sourceUser = userInfo.id
-      callMap[sourceUser] && delete callMap[sourceUser][userId]
+      calltoMap[sourceUser] && delete calltoMap[sourceUser][userId]
       let targetUser = userMap[userId]
-      let targetSocket = io.sockets.sockets[targetUser.socketId]
-      // 告知目标用户已中断请求
-      targetSocket.emit('breakCall', {
-        type: 'break',
-        sourceUser: {
-          id: userInfo.id
+      if (targetUser) {
+        let targetSocket = io.sockets.sockets[targetUser.socketId]
+        // 告知目标用户已中断请求
+        targetSocket.emit('breakCall', {
+          type: 'break',
+          sourceUser: {
+            id: userInfo.id
+          }
+        })
+      }
+    })
+
+    // 拒绝请求，请求通话人 id
+    socket.on('refuseCall', sourceUserId => {
+      if (!checkLogin(socket)) return false
+      let userInfo = socket._userInfo_
+      let userId = userInfo.id
+      if (callgetMap[userId] && callgetMap[userId][sourceUserId]) {
+        let sourceUser = userMap[sourceUserId]
+        if (sourceUser) {
+          let sourceSocket = io.sockets.sockets[sourceUser.socketId]
+          sourceSocket.emit('refuseCall', {
+            type: 'refuse',
+            targetUser: {
+              id: userId
+            }
+          })
         }
-      })
+      }
+    })
+
+    // 接受请求进入房间
+    socket.on('acceptCall', sourceUserId => {
+      if (!checkLogin(socket)) return false
+      let userInfo = socket._userInfo_
+      let userId = userInfo.id
+      if (callgetMap[userId] && callgetMap[userId][sourceUserId]) {
+        let sourceUser = userMap[sourceUserId]
+        if (sourceUser) {
+          let sourceSocket = io.sockets.sockets[sourceUser.socketId]
+          sourceSocket.emit('acceptCall', {
+            type: 'accept',
+            targetUser: {
+              id: userId
+            }
+          })
+        }
+      }
     })
 
     // 聊天信息
