@@ -27,11 +27,12 @@
               <div class="member">
                 <el-avatar :size="100" shape="square" :src="userInfo.avatar"></el-avatar>
                 <p>{{ userInfo.nickname }}</p>
+                <div id="self-video" v-show="false"></div>
               </div>
-              <div class="member">
+              <!-- <div class="member">
                 <el-avatar :size="100" shape="square" :src="userInfo.avatar"></el-avatar>
                 <p>{{ userInfo.nickname }}</p>
-              </div>
+              </div> -->
             </div>
             <div class="device-wrapper">
               <div class="device-icon">
@@ -61,7 +62,7 @@ import 'quill/dist/quill.bubble.css'
 import { quillEditor } from 'vue-quill-editor'
 import { formatTime } from '../utils/util'
 // import TRTC from 'trtc-js-sdk'
-// import RtcClient from '../utils/rtc-client'
+import RtcClient from '../utils/rtc-client'
 import { mapGetters } from 'vuex'
 import API from '@/utils/api'
 
@@ -95,7 +96,7 @@ export default {
     ...mapGetters(['userInfo'])
   },
 
-  activated() {
+  async activated() {
     // TRTC.getDevices()
     //   .then(devices => {
     //     devices.forEach(item => {
@@ -106,6 +107,8 @@ export default {
     // this.talkSecondsInterval()
     this.chatContent = []
     this.$socket.emit('joinRoom', this.$route.params.id)
+    // const { sdkAppId, userSig } = await this.getUserSig()
+    // this.createRoom(sdkAppId, userSig)
   },
 
   beforeRouteLeave(to, form, next) {
@@ -114,6 +117,15 @@ export default {
   },
 
   methods: {
+    async getUserSig() {
+      try {
+        const res = await API.getUserSig(this.userInfo.id)
+        return res.data.data
+      } catch (err) {
+        console.log(err)
+      }
+    },
+
     talkSecondsInterval() {
       setInterval(() => {
         this.talkSeconds += 1
@@ -127,15 +139,17 @@ export default {
       this.talkTime = `${mins[1] ? mins : '0' + mins} : ${secs[1] ? secs : '0' + secs}`
     },
 
-    createRoom() {
-      // let rct = new RtcClient({
-      //   userId: '8023',
-      //   roomId: '6666',
-      //   playid: 'self-video'
-      // })
+    createRoom(sdkAppId, userSig) {
+      let rct = new RtcClient({
+        userId: this.userInfo.id,
+        roomId: this.$route.params.id,
+        sdkAppId: sdkAppId,
+        userSig: userSig,
+        playid: 'self-video'
+      })
       // rct.join()
-      // this.client_ = rct.client_
-      // this.handleEvents()
+      this.client_ = rct.client_
+      this.handleEvents()
     },
 
     muteAudio() {

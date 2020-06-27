@@ -1,5 +1,4 @@
 import TRTC from 'trtc-js-sdk'
-import genTestUserSig from '../../server/secret/GenerateTestUserSig'
 
 export default class RtcClient {
   // sdkAppId_: number
@@ -17,12 +16,11 @@ export default class RtcClient {
   // playid_: string
 
   constructor(options) {
-    const { sdkAppId, userSig } = genTestUserSig(options.userId)
     this.userId_ = options.userId
     this.roomId_ = options.roomId
     this.playid_ = options.playid
-    this.sdkAppId_ = sdkAppId
-    this.userSig_ = userSig
+    this.sdkAppId_ = options.sdkAppId
+    this.userSig_ = options.userSig
 
     this.isJoined_ = false
     this.isPublished_ = false
@@ -183,9 +181,7 @@ export default class RtcClient {
       const userId = remoteStream.getUserId()
       this.members_.set(userId, remoteStream)
       this.client_.subscribe(remoteStream)
-      console.log(
-        `remote stream added: [${userId}] ID: ${id} type: ${remoteStream.getType()}`
-      )
+      console.log(`remote stream added: [${userId}] ID: ${id} type: ${remoteStream.getType()}`)
     })
     // fired when a remote stream has been subscribed
     this.client_.on('stream-subscribed', evt => {
@@ -262,9 +258,7 @@ export default class RtcClient {
   }
 
   showStreamState(stream) {
-    console.log(
-      'has audio: ' + stream.hasAudio() + ' has video: ' + stream.hasVideo()
-    )
+    console.log('has audio: ' + stream.hasAudio() + ' has video: ' + stream.hasVideo())
   }
 
   getUidByStreamId(streamId) {

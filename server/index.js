@@ -8,7 +8,7 @@ const path = require('path')
 const router = require('./router')
 const server = require('http').createServer(app.callback())
 const io = require('socket.io')(server)
-const socketHandle = require('./api/socket')
+const { socketHandle } = require('./api/socket')
 
 const CONFIG = {
   key: 'koa:sess',

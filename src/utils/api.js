@@ -15,7 +15,8 @@ export const URL = {
   getReply: '/api/topic/getReply', // 获取评论列表
 
   // 房间
-  entryInfo: '/api/room/message' // 进入，离开页面信息测试
+  entryInfo: '/api/room/message', // 进入，离开页面信息测试
+  getUserSig: '/api/room/getUserSig' // 生成用户凭证
 }
 
 const API = {
@@ -86,6 +87,11 @@ const API = {
 
   entryInfo(message) {
     return http.post(URL.entryInfo, { message })
+  },
+
+  // 获取语音连接用户凭证
+  getUserSig(userId) {
+    return http.get(URL.getUserSig, { params: { userId } })
   }
 }
 

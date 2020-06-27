@@ -83,6 +83,9 @@ function socketHandle(io) {
     // 进入房间
     socket.on('joinRoom', id => {
       if (!checkLogin(socket)) return false
+      if (socket._room_ && socket._room_.indexOf(id) !== -1) {
+        return
+      }
       // 记录房间中人员
       roomMap[id] = roomMap[id] || []
       roomMap[id].push(socket._userInfo_)
@@ -207,20 +210,20 @@ function socketHandle(io) {
     })
 
     socket.on('disconnect', () => {
-      // 删除在线人员
-      if (socket._userInfo_ && userMap[socket._userInfo_.id]) {
-        delete userMap[socket._userInfo_.id]
-        userCounter--
-        io.emit('onlineCounter', userCounter)
-      }
       // 如果加入过房间，人员离开房间，房间删除此人员
       if (socket._room_) {
         for (let i = 0, len = socket._room_.length; i < len; i++) {
           leaveRoom(io, socket, socket._room_[i])
         }
       }
+      // 删除在线人员
+      if (socket._userInfo_ && userMap[socket._userInfo_.id]) {
+        delete userMap[socket._userInfo_.id]
+        userCounter--
+        io.emit('onlineCounter', userCounter)
+      }
     })
   })
 }
 
-module.exports = socketHandle
+module.exports = { socketHandle, userMap }
